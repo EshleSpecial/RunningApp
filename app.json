@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "RunDisney Training",
+    "slug": "rundisney-training",
+    "version": "1.0.0",
+    "scheme": "rundisney-training",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#1e40af"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rundisney.training"
+    },
+    "android": {
+      "package": "com.rundisney.training",
+      "adaptiveIcon": {
+        "backgroundColor": "#1e40af"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
