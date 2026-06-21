@@ -11,8 +11,9 @@ import type { PTLog, StreakMeta, TrainingWeek, UserProfile, Workout, WorkoutLog 
 
 const TODAY = format(new Date(), 'yyyy-MM-dd');
 
-function daysUntil(dateStr: string): number {
-  return differenceInDays(parseISO(dateStr), new Date());
+function daysUntil(dateStr: string | undefined): number {
+  if (!dateStr) return 0;
+  try { return differenceInDays(parseISO(dateStr), new Date()); } catch { return 0; }
 }
 
 function weeklyMilesDone(plan: TrainingWeek[], log: WorkoutLog, weekStart: string): number {
