@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { UserProfile, TrainingWeek, WorkoutLog, PTLog } from '../types';
+import type { UserProfile, TrainingWeek, WorkoutLog, PTLog, WorkoutLogEntry, StreakMeta } from '../types';
 
 const KEYS = {
   USER_PROFILE: 'user_profile',
   TRAINING_PLAN: 'training_plan',
   WORKOUT_LOG: 'workout_log',
   PT_LOG: 'pt_log',
+  STREAK_META: 'streak_meta',
 } as const;
 
 export async function saveUserProfile(profile: UserProfile): Promise<void> {
@@ -42,6 +43,28 @@ export async function savePTLog(log: PTLog): Promise<void> {
 export async function loadPTLog(): Promise<PTLog> {
   const raw = await AsyncStorage.getItem(KEYS.PT_LOG);
   return raw ? (JSON.parse(raw) as PTLog) : {};
+}
+
+export async function loadStreakMeta(): Promise<StreakMeta> {
+  const raw = await AsyncStorage.getItem(KEYS.STREAK_META);
+  return raw ? (JSON.parse(raw) as StreakMeta) : { longestStreak: 0, totalWorkoutsCompleted: 0 };
+}
+
+export async function saveStreakMeta(meta: StreakMeta): Promise<void> {
+  await AsyncStorage.setItem(KEYS.STREAK_META, JSON.stringify(meta));
+}
+
+export async function patchWorkoutLogEntry(
+  date: string,
+  patch: Partial<WorkoutLogEntry>
+): Promise<WorkoutLog> {
+  const log = await loadWorkoutLog();
+  const updated: WorkoutLog = {
+    ...log,
+    [date]: { ...(log[date] ?? { completed: false }), ...patch },
+  };
+  await saveWorkoutLog(updated);
+  return updated;
 }
 
 export async function clearAll(): Promise<void> {

@@ -8,19 +8,30 @@ export type WorkoutType =
 
 export type Phase = 1 | 2 | 3 | 4 | 5;
 
+export type CourseDifficulty = 'flat' | 'rolling' | 'hilly' | 'very_hilly';
+
 export interface UserProfile {
   name: string;
   currentWeeklyMiles: number;
-  hipPainLevel: number; // 1–10
-  wineAndDineDate: string; // ISO date 'yyyy-MM-dd'
-  dopeyStartDate: string;  // ISO date 'yyyy-MM-dd'
+  hipPainLevel: number;
+  wineAndDineDate: string;
+  dopeyStartDate: string;
   stravaAccessToken?: string;
   onboardingComplete: boolean;
+  trainingDaysPerWeek: number;
+  prefersTreadmill: boolean;
+  currentPaceMinPerMile: number;
+  raceCourseDifficulty: CourseDifficulty;
+}
+
+export interface StreakMeta {
+  longestStreak: number;
+  totalWorkoutsCompleted: number;
 }
 
 export interface Workout {
   id: string;
-  date: string; // 'yyyy-MM-dd'
+  date: string;
   type: WorkoutType;
   distanceMiles?: number;
   durationMins?: number;
@@ -29,7 +40,7 @@ export interface Workout {
 
 export interface TrainingWeek {
   weekNumber: number;
-  startDate: string; // 'yyyy-MM-dd'
+  startDate: string;
   phase: Phase;
   phaseName: string;
   isTaper: boolean;
@@ -41,6 +52,8 @@ export interface WorkoutLogEntry {
   swappedToCrossTraining?: boolean;
   painLevelAtTime?: number;
   userNotes?: string;
+  actualPaceMinPerMile?: number;
+  gelsConsumed?: number;
 }
 
 export type WorkoutLog = Record<string, WorkoutLogEntry>;
@@ -55,4 +68,4 @@ export interface PTExercise {
   tip: string;
 }
 
-export type PTLog = Record<string, string[]>; // date → completed exercise ids
+export type PTLog = Record<string, string[]>;

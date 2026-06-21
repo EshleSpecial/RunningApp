@@ -39,6 +39,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="progress"
+        options={{
+          title: 'Stats',
+          tabBarIcon: ({ color, size }) => <TabIcon name="trophy-outline" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
