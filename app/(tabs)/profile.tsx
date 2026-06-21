@@ -4,7 +4,16 @@ import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Divider, Surface, Text, TextInput } from 'react-native-paper';
 import { clearAll, loadUserProfile, saveTrainingPlan, saveUserProfile } from '../../lib/storage';
 import { generateTrainingPlan } from '../../lib/trainingPlan';
+import { formatPace } from '../../lib/fueling';
 import type { UserProfile } from '../../types';
+
+const PACE_OPTIONS: { label: string; value: number }[] = [
+  { label: 'Under 10:00/mi', value: 9.5 },
+  { label: '10:00–12:00/mi', value: 11.0 },
+  { label: '12:00–14:00/mi', value: 13.0 },
+  { label: '14:00–16:00/mi', value: 15.0 },
+  { label: 'Over 16:00/mi', value: 17.0 },
+];
 
 export default function ProfileScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -14,6 +23,10 @@ export default function ProfileScreen() {
   const [painLevel, setPainLevel] = useState(3);
   const [wineDate, setWineDate] = useState('');
   const [dopeyDate, setDopeyDate] = useState('');
+  const [trainingDays, setTrainingDays] = useState(5);
+  const [prefersTreadmill, setPrefersTreadmill] = useState(false);
+  const [pace, setPace] = useState(13.0);
+  const [courseDifficulty, setCourseDifficulty] = useState<'flat' | 'rolling' | 'hilly' | 'very_hilly'>('flat');
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -25,6 +38,10 @@ export default function ProfileScreen() {
       setPainLevel(p.hipPainLevel);
       setWineDate(p.wineAndDineDate);
       setDopeyDate(p.dopeyStartDate);
+      setTrainingDays(p.trainingDaysPerWeek ?? 5);
+      setPrefersTreadmill(p.prefersTreadmill ?? false);
+      setPace(p.currentPaceMinPerMile ?? 13.0);
+      setCourseDifficulty(p.raceCourseDifficulty ?? 'flat');
     }
   }, []);
 
@@ -40,6 +57,10 @@ export default function ProfileScreen() {
       hipPainLevel: painLevel,
       wineAndDineDate: wineDate,
       dopeyStartDate: dopeyDate,
+      trainingDaysPerWeek: trainingDays,
+      prefersTreadmill,
+      currentPaceMinPerMile: pace,
+      raceCourseDifficulty: courseDifficulty,
     };
     const plan = generateTrainingPlan(updated);
     await saveUserProfile(updated);
@@ -79,7 +100,7 @@ export default function ProfileScreen() {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Text variant="headlineSmall" style={styles.title}>Profile</Text>
-        <Text variant="bodySmall" style={styles.subtitle}>{profile.name}'s RunDisney Journey</Text>
+        <Text variant="bodySmall" style={styles.subtitle}>{profile.name}'s Training Journey</Text>
       </View>
 
       <Surface style={styles.card} elevation={1}>
@@ -172,6 +193,110 @@ export default function ProfileScreen() {
             <Text style={styles.value}>{profile.dopeyStartDate}</Text>
           )}
         </View>
+        <Divider style={styles.rowDivider} />
+
+        <View style={styles.cardRow}>
+          <Text style={styles.label}>Training days/week</Text>
+          {editing ? (
+            <View style={styles.daysRow}>
+              {[3, 4, 5, 6].map(d => (
+                <Button
+                  key={d}
+                  mode={trainingDays === d ? 'contained' : 'outlined'}
+                  onPress={() => setTrainingDays(d)}
+                  style={[styles.dayBtn, trainingDays === d && { backgroundColor: '#1e40af' }]}
+                  labelStyle={[{ fontSize: 11, fontWeight: '700' }, trainingDays === d && { color: '#fff' }]}
+                  contentStyle={{ paddingHorizontal: 0, minWidth: 0 }}
+                >
+                  {String(d)}
+                </Button>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.value}>{profile.trainingDaysPerWeek ?? 5} days</Text>
+          )}
+        </View>
+        <Divider style={styles.rowDivider} />
+
+        <View style={styles.cardRow}>
+          <Text style={styles.label}>Running surface</Text>
+          {editing ? (
+            <View style={styles.envRow}>
+              <Button
+                mode={!prefersTreadmill ? 'contained' : 'outlined'}
+                onPress={() => setPrefersTreadmill(false)}
+                style={[styles.envBtn, !prefersTreadmill && { backgroundColor: '#16a34a' }]}
+                labelStyle={[{ fontSize: 11 }, !prefersTreadmill && { color: '#fff' }]}
+                contentStyle={{ paddingHorizontal: 6, minWidth: 0 }}
+              >
+                Outdoor
+              </Button>
+              <Button
+                mode={prefersTreadmill ? 'contained' : 'outlined'}
+                onPress={() => setPrefersTreadmill(true)}
+                style={[styles.envBtn, prefersTreadmill && { backgroundColor: '#1e40af' }]}
+                labelStyle={[{ fontSize: 11 }, prefersTreadmill && { color: '#fff' }]}
+                contentStyle={{ paddingHorizontal: 6, minWidth: 0 }}
+              >
+                Treadmill
+              </Button>
+            </View>
+          ) : (
+            <Text style={styles.value}>{(profile.prefersTreadmill ?? false) ? 'Treadmill' : 'Outdoor'}</Text>
+          )}
+        </View>
+        <Divider style={styles.rowDivider} />
+
+        <View style={styles.cardRow}>
+          <Text style={styles.label}>Easy pace</Text>
+          {editing ? (
+            <View style={styles.paceCol}>
+              {[
+                { label: '< 10:00/mi', value: 9.5 },
+                { label: '10–12/mi', value: 11.0 },
+                { label: '12–14/mi', value: 13.0 },
+                { label: '14–16/mi', value: 15.0 },
+                { label: '16+/mi', value: 17.0 },
+              ].map(opt => (
+                <Button
+                  key={opt.value}
+                  mode={pace === opt.value ? 'contained' : 'outlined'}
+                  onPress={() => setPace(opt.value)}
+                  style={[styles.paceBtn, pace === opt.value && { backgroundColor: '#7c3aed' }]}
+                  labelStyle={[{ fontSize: 11 }, pace === opt.value && { color: '#fff' }]}
+                  contentStyle={{ paddingHorizontal: 4, minWidth: 0 }}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.value}>{formatPace(profile.currentPaceMinPerMile ?? 13.0)}</Text>
+          )}
+        </View>
+        <Divider style={styles.rowDivider} />
+
+        <View style={styles.cardRow}>
+          <Text style={styles.label}>Course terrain</Text>
+          {editing ? (
+            <View style={styles.courseRow}>
+              {(['flat', 'rolling', 'hilly', 'very_hilly'] as const).map(d => (
+                <Button
+                  key={d}
+                  mode={courseDifficulty === d ? 'contained' : 'outlined'}
+                  onPress={() => setCourseDifficulty(d)}
+                  style={[styles.courseBtn, courseDifficulty === d && { backgroundColor: '#1e40af' }]}
+                  labelStyle={[{ fontSize: 10 }, courseDifficulty === d && { color: '#fff' }]}
+                  contentStyle={{ paddingHorizontal: 2, minWidth: 0 }}
+                >
+                  {d === 'very_hilly' ? 'V.Hilly' : d.charAt(0).toUpperCase() + d.slice(1)}
+                </Button>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.value}>{(profile.raceCourseDifficulty ?? 'flat').replace('_', ' ')}</Text>
+          )}
+        </View>
       </Surface>
 
       {editing ? (
@@ -256,6 +381,14 @@ const styles = StyleSheet.create({
   inlineInput: { flex: 1.5, backgroundColor: '#fff' },
   painMini: { flexDirection: 'row', flexWrap: 'wrap', gap: 3, flex: 2, justifyContent: 'flex-end' },
   painMiniBtn: { width: 30, minWidth: 0, height: 30, borderRadius: 6 },
+  daysRow: { flexDirection: 'row', gap: 4 },
+  dayBtn: { width: 40, minWidth: 0, height: 34, borderRadius: 6 },
+  envRow: { flexDirection: 'row', gap: 6 },
+  envBtn: { minWidth: 0 },
+  paceCol: { gap: 4, flex: 1.5 },
+  paceBtn: { minWidth: 0 },
+  courseRow: { flexDirection: 'row', gap: 4, flex: 2, justifyContent: 'flex-end' },
+  courseBtn: { minWidth: 0 },
   btnRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
   btn: { flex: 1 },
   editBtn: { marginBottom: 12 },

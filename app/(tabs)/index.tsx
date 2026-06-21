@@ -11,7 +11,10 @@ import {
   savePTLog,
   saveWorkoutLog,
 } from '../../lib/storage';
-import type { PTLog, TrainingWeek, UserProfile, Workout, WorkoutLog } from '../../types';
+import { getDailyQuote } from '../../lib/quotes';
+import { computeStreak, getEarnedBadges } from '../../lib/streaks';
+import { patchWorkoutLogEntry, loadStreakMeta, saveStreakMeta } from '../../lib/storage';
+import type { PTLog, StreakMeta, TrainingWeek, UserProfile, Workout, WorkoutLog } from '../../types';
 
 const TODAY = format(new Date(), 'yyyy-MM-dd');
 
@@ -41,20 +44,23 @@ export default function Dashboard() {
   const [plan, setPlan] = useState<TrainingWeek[]>([]);
   const [workoutLog, setWorkoutLog] = useState<WorkoutLog>({});
   const [ptLog, setPtLog] = useState<PTLog>({});
+  const [streakMeta, setStreakMeta] = useState<StreakMeta>({ longestStreak: 0, totalWorkoutsCompleted: 0 });
   const [painLevel, setPainLevel] = useState(3);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    const [p, pl, wl, ptl] = await Promise.all([
+    const [p, pl, wl, ptl, sm] = await Promise.all([
       loadUserProfile(),
       loadTrainingPlan(),
       loadWorkoutLog(),
       loadPTLog(),
+      loadStreakMeta(),
     ]);
     if (p) { setProfile(p); setPainLevel(p.hipPainLevel); }
     if (pl) setPlan(pl);
     setWorkoutLog(wl);
     setPtLog(ptl);
+    setStreakMeta(sm);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -72,6 +78,23 @@ export default function Dashboard() {
     };
     setWorkoutLog(updated);
     await saveWorkoutLog(updated);
+
+    // Update streak meta
+    const newStreak = computeStreak(updated, plan);
+    const newMeta: StreakMeta = {
+      longestStreak: Math.max(streakMeta.longestStreak, newStreak),
+      totalWorkoutsCompleted: streakMeta.totalWorkoutsCompleted + 1,
+    };
+    setStreakMeta(newMeta);
+    await saveStreakMeta(newMeta);
+  }
+
+  async function saveRunData(date: string, pace?: number, gels?: number) {
+    const updated = await patchWorkoutLogEntry(date, {
+      ...(pace !== undefined ? { actualPaceMinPerMile: pace } : {}),
+      ...(gels !== undefined ? { gelsConsumed: gels } : {}),
+    });
+    setWorkoutLog(updated);
   }
 
   async function swapToCrossTraining() {
@@ -131,6 +154,39 @@ export default function Dashboard() {
           </Chip>
         )}
       </View>
+
+      {/* Daily quote */}
+      {(() => {
+        const q = getDailyQuote();
+        return (
+          <Surface style={styles.quoteCard} elevation={0}>
+            <Text style={styles.quoteText}>"{q.text}"</Text>
+            <Text style={styles.quoteAuthor}>— {q.author}</Text>
+          </Surface>
+        );
+      })()}
+
+      {/* Streak */}
+      {(() => {
+        const streak = computeStreak(workoutLog, plan);
+        const badges = getEarnedBadges(streak, streakMeta.longestStreak);
+        if (streak === 0 && badges.length === 0) return null;
+        return (
+          <Surface style={styles.streakCard} elevation={1}>
+            <View style={styles.streakRow}>
+              <Text style={styles.streakFlame}>🔥</Text>
+              <Text style={styles.streakCount}>{streak}</Text>
+              <Text style={styles.streakLabel}>day streak</Text>
+              {badges.length > 0 && (
+                <Text style={styles.streakBadge}>{badges[badges.length - 1].emoji}</Text>
+              )}
+            </View>
+            {streakMeta.longestStreak > streak && (
+              <Text style={styles.streakBest}>Best: {streakMeta.longestStreak} days</Text>
+            )}
+          </Surface>
+        );
+      })()}
 
       {/* Countdowns */}
       <View style={styles.countdownRow}>
@@ -193,6 +249,9 @@ export default function Dashboard() {
           onComplete={markComplete}
           onSwapCrossTraining={swapToCrossTraining}
           showSwap={showSwap}
+          paceMinPerMile={profile.currentPaceMinPerMile ?? 12}
+          prefersTreadmill={profile.prefersTreadmill ?? false}
+          onSaveRunData={saveRunData}
         />
       ) : (
         <Surface style={styles.card} elevation={1}>
@@ -264,4 +323,43 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   ptNudgeText: { color: '#5b21b6', fontWeight: '600' },
+  quoteCard: {
+    borderRadius: 12,
+    padding: 14,
+    backgroundColor: '#f0f9ff',
+    marginBottom: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: '#38bdf8',
+  },
+  quoteText: {
+    color: '#0c4a6e',
+    fontSize: 13,
+    fontStyle: 'italic',
+    lineHeight: 19,
+  },
+  quoteAuthor: {
+    color: '#0369a1',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 6,
+    textAlign: 'right',
+  },
+  streakCard: {
+    borderRadius: 12,
+    padding: 12,
+    backgroundColor: '#fff7ed',
+    marginBottom: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#f97316',
+  },
+  streakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  streakFlame: { fontSize: 22 },
+  streakCount: { fontSize: 28, fontWeight: '900', color: '#c2410c' },
+  streakLabel: { fontSize: 13, color: '#9a3412', fontWeight: '600', flex: 1 },
+  streakBadge: { fontSize: 24 },
+  streakBest: { fontSize: 11, color: '#c2410c', marginTop: 2 },
 });

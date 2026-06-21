@@ -8,6 +8,8 @@ export type WorkoutType =
 
 export type Phase = 1 | 2 | 3 | 4 | 5;
 
+export type CourseDifficulty = 'flat' | 'rolling' | 'hilly' | 'very_hilly';
+
 export interface UserProfile {
   name: string;
   currentWeeklyMiles: number;
@@ -16,6 +18,17 @@ export interface UserProfile {
   dopeyStartDate: string;  // ISO date 'yyyy-MM-dd'
   stravaAccessToken?: string;
   onboardingComplete: boolean;
+  // Phase 2
+  trainingDaysPerWeek: number;   // 3–6, how many active days per week
+  prefersTreadmill: boolean;     // treadmill vs outdoor
+  currentPaceMinPerMile: number; // easy pace, e.g. 12.0 = 12:00/mi
+  // Phase 3
+  raceCourseDifficulty: CourseDifficulty;
+}
+
+export interface StreakMeta {
+  longestStreak: number;
+  totalWorkoutsCompleted: number;
 }
 
 export interface Workout {
@@ -41,6 +54,9 @@ export interface WorkoutLogEntry {
   swappedToCrossTraining?: boolean;
   painLevelAtTime?: number;
   userNotes?: string;
+  // Phase 3
+  actualPaceMinPerMile?: number;
+  gelsConsumed?: number;
 }
 
 export type WorkoutLog = Record<string, WorkoutLogEntry>;

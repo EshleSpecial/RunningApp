@@ -1,5 +1,47 @@
 import { addDays, addWeeks, differenceInWeeks, format, parseISO } from 'date-fns';
-import type { Phase, TrainingWeek, UserProfile, Workout, WorkoutType } from '../types';
+import type { CourseDifficulty, Phase, TrainingWeek, UserProfile, Workout, WorkoutType } from '../types';
+
+function hillNote(difficulty: CourseDifficulty): string {
+  if (difficulty === 'hilly') {
+    return ' Hill training: after 1 mi warm-up, run 6 repeats of 45 sec hard uphill with easy jog-down recovery. Finish with 1 mi easy. These replicate your race terrain.';
+  }
+  if (difficulty === 'very_hilly') {
+    return ' Race-specific hill workout: after 1 mi warm-up, run 8–10 repeats of 60 sec hard uphill with easy jog-down recovery. Building specific strength for your hilly course.';
+  }
+  return '';
+}
+
+function runPriority(w: Workout): number {
+  if (w.type === 'long_run' || w.type === 'race') return 0;
+  if (w.type === 'cross_train') return 1;
+  if (w.type === 'easy_run') {
+    const magnitude = w.distanceMiles ?? (w.durationMins ?? 0) / 10;
+    return magnitude >= 3 ? 2 : 3;
+  }
+  return 4;
+}
+
+function adjustToTrainingDays(workouts: Workout[], targetDays: number): Workout[] {
+  const active = workouts.filter(
+    w => w.type !== 'rest' && w.type !== 'pt_only'
+  );
+  if (active.length <= targetDays) return workouts;
+
+  const sorted = [...active].sort((a, b) => runPriority(a) - runPriority(b));
+  const keep = new Set(sorted.slice(0, targetDays).map(w => w.date));
+
+  return workouts.map(w => {
+    if (w.type === 'rest' || w.type === 'pt_only') return w;
+    if (keep.has(w.date)) return w;
+    return {
+      ...w,
+      type: 'rest' as WorkoutType,
+      distanceMiles: undefined,
+      durationMins: undefined,
+      notes: 'Rest day. Light stretching and stay hydrated.',
+    };
+  });
+}
 
 const PLAN_START = new Date(2026, 5, 15); // June 15, 2026 (Monday)
 
@@ -62,6 +104,8 @@ export function generateTrainingPlan(profile: UserProfile): TrainingWeek[] {
 
     let workouts: Workout[];
 
+    const difficulty: CourseDifficulty = profile.raceCourseDifficulty ?? 'flat';
+
     if (isWineWeek) {
       workouts = buildWineAndDineRaceWeek(weekStart, wineAndDine);
     } else if (isDopeyWeek) {
@@ -69,7 +113,12 @@ export function generateTrainingPlan(profile: UserProfile): TrainingWeek[] {
     } else if (isTaper) {
       workouts = buildTaperWeek(weekStart, phase, longRunMiles * mult);
     } else {
-      workouts = buildRegularWeek(weekStart, phase, longRunMiles * mult);
+      workouts = buildRegularWeek(weekStart, phase, longRunMiles * mult, difficulty);
+    }
+
+    const targetDays = profile.trainingDaysPerWeek ?? 5;
+    if (targetDays < 6 && !isWineWeek && !isDopeyWeek) {
+      workouts = adjustToTrainingDays(workouts, targetDays);
     }
 
     weeks.push({ weekNumber: w, startDate: toISO(weekStart), phase, phaseName, isTaper, workouts });
@@ -89,7 +138,7 @@ export function generateTrainingPlan(profile: UserProfile): TrainingWeek[] {
 
 // Offsets: 0=Mon 1=Tue 2=Wed 3=Thu 4=Fri 5=Sat 6=Sun
 
-function buildRegularWeek(ws: Date, phase: Phase, longRun: number): Workout[] {
+function buildRegularWeek(ws: Date, phase: Phase, longRun: number, difficulty: CourseDifficulty = 'flat'): Workout[] {
   const lr = parseFloat(longRun.toFixed(1));
 
   if (phase === 1) {
@@ -105,10 +154,11 @@ function buildRegularWeek(ws: Date, phase: Phase, longRun: number): Workout[] {
   }
 
   if (phase === 2) {
+    const wed2Notes = 'Easy run. If hips feel tight, take walk breaks.' + hillNote(difficulty);
     return [
       workout(ws, 0, 'easy_run', { distanceMiles: 3, notes: 'Easy run. Conversational pace throughout. 170–180 spm.' }),
       workout(ws, 1, 'pt_only', { notes: 'Full PT session.' }),
-      workout(ws, 2, 'easy_run', { distanceMiles: 3.5, notes: 'Easy run. If hips feel tight, take walk breaks.' }),
+      workout(ws, 2, 'easy_run', { distanceMiles: 3.5, notes: wed2Notes }),
       workout(ws, 3, 'cross_train', { durationMins: 35, notes: 'Active recovery — bike, swim, or elliptical at easy effort.' }),
       workout(ws, 4, 'easy_run', { distanceMiles: 3, notes: 'Easy run. End with PT stability exercises.' }),
       workout(ws, 5, 'long_run', { distanceMiles: lr, notes: `Long run at easy conversational pace. Time on feet matters more than pace. Walk breaks are encouraged. 170–180 spm.` }),
@@ -117,10 +167,11 @@ function buildRegularWeek(ws: Date, phase: Phase, longRun: number): Workout[] {
   }
 
   if (phase === 3) {
+    const wed3Notes = 'Include 2 miles at 10K goal pace in the middle. Hip check at halfway.' + hillNote(difficulty);
     return [
       workout(ws, 0, 'easy_run', { distanceMiles: 4, notes: 'Easy run. Steady effort, keep it comfortable.' }),
       workout(ws, 1, 'pt_only', { notes: 'PT exercises + hip flexor stretching.' }),
-      workout(ws, 2, 'easy_run', { distanceMiles: 5, notes: 'Include 2 miles at 10K goal pace in the middle. Hip check at halfway.' }),
+      workout(ws, 2, 'easy_run', { distanceMiles: 5, notes: wed3Notes }),
       workout(ws, 3, 'rest', { notes: 'Rest before long run weekend.' }),
       workout(ws, 4, 'easy_run', { distanceMiles: 4, notes: 'Easy shakeout. Legs fresh for tomorrow\'s long run.' }),
       workout(ws, 5, 'long_run', { distanceMiles: lr, notes: `Long run. This is your most important workout. Easy effort — you should be able to hold a conversation. Walk the uphills.` }),
