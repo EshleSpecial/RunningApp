@@ -21,11 +21,11 @@
     "expo-web-browser": "*",
     "react": "19.0.0",
     "react-native": "0.81.5",
-    "react-native-gesture-handler": "*",
+    "react-native-gesture-handler": "^2.24.0",
     "react-native-paper": "^5.12.3",
-    "react-native-reanimated": "*",
-    "react-native-safe-area-context": "*",
-    "react-native-screens": "*"
+    "react-native-reanimated": "^3.17.0",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "^4.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
