@@ -4,31 +4,20 @@
     "slug": "rundisney-training",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#f0f4ff"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rundisney.training"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#f0f4ff"
-      },
       "package": "com.rundisney.training"
     },
     "web": {
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router",
-      "expo-font"
+      "expo-router"
     ],
     "scheme": "rundisney-training"
   }
