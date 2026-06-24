@@ -21,7 +21,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Today',
-          tabBarIcon: ({ color, size }) => <TabIcon name="home-run" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <TabIcon name="run-fast" color={color} size={size} />,
         }}
       />
       <Tabs.Screen
