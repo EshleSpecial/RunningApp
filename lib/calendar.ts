@@ -3,15 +3,13 @@ import { Platform } from 'react-native';
 import { addMinutes, parseISO } from 'date-fns';
 import type { TrainingWeek } from '../types';
 
-const CAL_TITLE = 'RunDisney Training';
-
 const WORKOUT_LABELS: Record<string, string> = {
   easy_run: 'Easy Run',
   long_run: 'Long Run',
   cross_train: 'Cross Training',
   pt_only: 'PT Exercises',
   rest: 'Rest Day',
-  race: 'RACE DAY',
+  race: 'Race Day',
 };
 
 const WORKOUT_DURATION_MINS: Record<string, number> = {
@@ -23,31 +21,16 @@ const WORKOUT_DURATION_MINS: Record<string, number> = {
   race: 240,
 };
 
-async function getOrCreateCalendarId(): Promise<string> {
+async function getDefaultCalendarId(): Promise<string> {
   const { status } = await Calendar.requestCalendarPermissionsAsync();
   if (status !== 'granted') throw new Error('Calendar permission denied');
 
-  const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-  const existing = calendars.find(c => c.title === CAL_TITLE && c.allowsModifications);
-  if (existing) return existing.id;
-
   if (Platform.OS === 'ios') {
-    const localSource =
-      calendars.find(c => c.source?.type === Calendar.SourceType.LOCAL)?.source ??
-      calendars[0]?.source;
-    return Calendar.createCalendarAsync({
-      title: CAL_TITLE,
-      color: '#1e40af',
-      entityType: Calendar.EntityTypes.EVENT,
-      sourceId: localSource?.id,
-      source: localSource,
-      name: 'runDisneyTraining',
-      ownerAccount: 'personal',
-      accessLevel: Calendar.CalendarAccessLevel.OWNER,
-    });
+    const defaultCal = await Calendar.getDefaultCalendarAsync();
+    return defaultCal.id;
   }
 
-  // Android: write into primary calendar
+  const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
   const primary = calendars.find(c => c.isPrimary) ?? calendars[0];
   if (!primary) throw new Error('No calendar found on device');
   return primary.id;
@@ -57,7 +40,7 @@ export async function exportPlanToCalendar(
   plan: TrainingWeek[],
   onProgress?: (done: number, total: number) => void
 ): Promise<number> {
-  const calId = await getOrCreateCalendarId();
+  const calId = await getDefaultCalendarId();
 
   const workouts = plan.flatMap(week =>
     week.workouts.filter(w => w.type !== 'rest')
@@ -77,7 +60,7 @@ export async function exportPlanToCalendar(
       .join(' — ');
 
     await Calendar.createEventAsync(calId, {
-      title: `🏃 ${label}`,
+      title: label,
       startDate,
       endDate,
       notes: notes || undefined,
