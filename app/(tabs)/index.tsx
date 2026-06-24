@@ -18,7 +18,8 @@ import type { PTLog, StreakMeta, TrainingWeek, UserProfile, Workout, WorkoutLog 
 
 const TODAY = format(new Date(), 'yyyy-MM-dd');
 
-function daysUntil(dateStr: string): number {
+function daysUntil(dateStr: string | undefined): number {
+  if (!dateStr) return 0;
   return differenceInDays(parseISO(dateStr), new Date());
 }
 
