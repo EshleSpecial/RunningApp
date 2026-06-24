@@ -1,9 +1,10 @@
 import { format, parseISO } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, SectionList, StyleSheet, View } from 'react-native';
-import { Chip, Divider, Surface, Text } from 'react-native-paper';
+import { Alert, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
+import { Button, Chip, Divider, Surface, Text } from 'react-native-paper';
 import WorkoutCard from '../../components/WorkoutCard';
 import { loadTrainingPlan, loadWorkoutLog } from '../../lib/storage';
+import { exportPlanToCalendar } from '../../lib/calendar';
 import type { TrainingWeek, WorkoutLog } from '../../types';
 
 const TODAY = format(new Date(), 'yyyy-MM-dd');
@@ -38,6 +39,7 @@ export default function PlanScreen() {
   const [plan, setPlan] = useState<TrainingWeek[]>([]);
   const [log, setLog] = useState<WorkoutLog>({});
   const [refreshing, setRefreshing] = useState(false);
+  const [calExporting, setCalExporting] = useState(false);
 
   const load = useCallback(async () => {
     const [pl, wl] = await Promise.all([loadTrainingPlan(), loadWorkoutLog()]);
@@ -52,6 +54,19 @@ export default function PlanScreen() {
     await load();
     setRefreshing(false);
   }, [load]);
+
+  async function handleExportCalendar() {
+    if (plan.length === 0) return;
+    setCalExporting(true);
+    try {
+      const count = await exportPlanToCalendar(plan);
+      Alert.alert('Calendar Export Complete', `Added ${count} workouts to your calendar (Apple or Google, whichever is set as default on your device).`);
+    } catch (e: any) {
+      Alert.alert('Export Failed', e.message ?? 'Could not export to calendar.');
+    } finally {
+      setCalExporting(false);
+    }
+  }
 
   const sections = groupByPhase(plan);
 
@@ -78,6 +93,16 @@ export default function PlanScreen() {
         <View style={styles.listHeader}>
           <Text variant="headlineSmall" style={styles.title}>Training Plan</Text>
           <Text variant="bodySmall" style={styles.subtitle}>30 weeks · Wine & Dine → Dopey Challenge</Text>
+          <Button
+            mode="outlined"
+            icon="calendar-export"
+            onPress={handleExportCalendar}
+            loading={calExporting}
+            disabled={calExporting || plan.length === 0}
+            style={styles.calBtn}
+          >
+            Export to Calendar
+          </Button>
         </View>
       }
     />
@@ -124,7 +149,8 @@ const styles = StyleSheet.create({
   content: { paddingBottom: 32 },
   listHeader: { padding: 16, paddingTop: 56 },
   title: { fontWeight: '800', color: '#1e40af' },
-  subtitle: { color: '#6b7280', marginTop: 4 },
+  subtitle: { color: '#6b7280', marginTop: 4, marginBottom: 10 },
+  calBtn: { alignSelf: 'flex-start', borderColor: '#1e40af' },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',

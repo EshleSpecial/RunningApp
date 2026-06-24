@@ -1,19 +1,29 @@
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Divider, Surface, Text, TextInput } from 'react-native-paper';
-import { clearAll, loadUserProfile, saveTrainingPlan, saveUserProfile } from '../../lib/storage';
+import { clearAll, loadUserProfile, loadTrainingPlan, saveTrainingPlan, saveUserProfile } from '../../lib/storage';
 import { generateTrainingPlan } from '../../lib/trainingPlan';
 import { formatPace } from '../../lib/fueling';
+import {
+  STRAVA_CLIENT_ID,
+  clearStravaTokens,
+  exchangeCodeForTokens,
+  loadStravaTokens,
+  syncStravaActivities,
+  type StravaTokens,
+} from '../../lib/strava';
 import type { UserProfile } from '../../types';
 
-const PACE_OPTIONS: { label: string; value: number }[] = [
-  { label: 'Under 10:00/mi', value: 9.5 },
-  { label: '10:00–12:00/mi', value: 11.0 },
-  { label: '12:00–14:00/mi', value: 13.0 },
-  { label: '14:00–16:00/mi', value: 15.0 },
-  { label: 'Over 16:00/mi', value: 17.0 },
-];
+WebBrowser.maybeCompleteAuthSession();
+
+const REDIRECT_URI = AuthSession.makeRedirectUri({ scheme: 'rundisney-training' });
+
+const STRAVA_DISCOVERY = {
+  authorizationEndpoint: 'https://www.strava.com/oauth/mobile/authorize',
+};
 
 export default function ProfileScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -29,8 +39,24 @@ export default function ProfileScreen() {
   const [courseDifficulty, setCourseDifficulty] = useState<'flat' | 'rolling' | 'hilly' | 'very_hilly'>('flat');
   const [saving, setSaving] = useState(false);
 
+  // Strava state
+  const [stravaTokens, setStravaTokens] = useState<StravaTokens | null>(null);
+  const [stravaLoading, setStravaLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: STRAVA_CLIENT_ID,
+      scopes: ['activity:read_all'],
+      redirectUri: REDIRECT_URI,
+      responseType: AuthSession.ResponseType.Code,
+      extraParams: { approval_prompt: 'auto' },
+    },
+    STRAVA_DISCOVERY
+  );
+
   const load = useCallback(async () => {
-    const p = await loadUserProfile();
+    const [p, tok] = await Promise.all([loadUserProfile(), loadStravaTokens()]);
     if (p) {
       setProfile(p);
       setName(p.name);
@@ -43,9 +69,62 @@ export default function ProfileScreen() {
       setPace(p.currentPaceMinPerMile ?? 13.0);
       setCourseDifficulty(p.raceCourseDifficulty ?? 'flat');
     }
+    setStravaTokens(tok);
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Handle OAuth redirect
+  useEffect(() => {
+    if (response?.type !== 'success') return;
+    const { code } = response.params;
+    if (!code) return;
+    setStravaLoading(true);
+    exchangeCodeForTokens(code).then(tokens => {
+      if (tokens) {
+        setStravaTokens(tokens);
+        Alert.alert('Strava Connected', `Welcome, ${tokens.athleteName}! Syncing your runs…`);
+        handleSync(tokens);
+      } else {
+        Alert.alert('Connection Failed', 'Could not exchange token. Check your Strava API credentials in lib/strava.ts.');
+      }
+      setStravaLoading(false);
+    });
+  }, [response]);
+
+  async function handleSync(tokens?: StravaTokens) {
+    setStravaLoading(true);
+    setSyncStatus('Syncing…');
+    try {
+      const plan = await loadTrainingPlan();
+      if (!plan) { setSyncStatus('No training plan found.'); return; }
+      const result = await syncStravaActivities(plan);
+      setSyncStatus(`Synced ${result.imported} new run${result.imported !== 1 ? 's' : ''} (${result.matched} matched).`);
+    } catch (e: any) {
+      setSyncStatus(`Sync failed: ${e.message}`);
+    } finally {
+      setStravaLoading(false);
+    }
+  }
+
+  function handleDisconnect() {
+    Alert.alert(
+      'Disconnect Strava',
+      'Remove Strava connection? Your already-imported runs will remain.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Disconnect',
+          style: 'destructive',
+          onPress: async () => {
+            await clearStravaTokens();
+            setStravaTokens(null);
+            setSyncStatus(null);
+          },
+        },
+      ]
+    );
+  }
 
   async function saveChanges() {
     if (!profile) return;
@@ -107,13 +186,7 @@ export default function ProfileScreen() {
         <View style={styles.cardRow}>
           <Text style={styles.label}>Name</Text>
           {editing ? (
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              mode="outlined"
-              dense
-              style={styles.inlineInput}
-            />
+            <TextInput value={name} onChangeText={setName} mode="outlined" dense style={styles.inlineInput} />
           ) : (
             <Text style={styles.value}>{profile.name}</Text>
           )}
@@ -164,14 +237,7 @@ export default function ProfileScreen() {
         <View style={styles.cardRow}>
           <Text style={styles.label}>Wine & Dine date</Text>
           {editing ? (
-            <TextInput
-              value={wineDate}
-              onChangeText={setWineDate}
-              mode="outlined"
-              dense
-              style={styles.inlineInput}
-              placeholder="yyyy-MM-dd"
-            />
+            <TextInput value={wineDate} onChangeText={setWineDate} mode="outlined" dense style={styles.inlineInput} placeholder="yyyy-MM-dd" />
           ) : (
             <Text style={styles.value}>{profile.wineAndDineDate}</Text>
           )}
@@ -181,14 +247,7 @@ export default function ProfileScreen() {
         <View style={styles.cardRow}>
           <Text style={styles.label}>Dopey Day 1 date</Text>
           {editing ? (
-            <TextInput
-              value={dopeyDate}
-              onChangeText={setDopeyDate}
-              mode="outlined"
-              dense
-              style={styles.inlineInput}
-              placeholder="yyyy-MM-dd"
-            />
+            <TextInput value={dopeyDate} onChangeText={setDopeyDate} mode="outlined" dense style={styles.inlineInput} placeholder="yyyy-MM-dd" />
           ) : (
             <Text style={styles.value}>{profile.dopeyStartDate}</Text>
           )}
@@ -301,9 +360,7 @@ export default function ProfileScreen() {
 
       {editing ? (
         <View style={styles.btnRow}>
-          <Button mode="outlined" onPress={() => setEditing(false)} style={styles.btn}>
-            Cancel
-          </Button>
+          <Button mode="outlined" onPress={() => setEditing(false)} style={styles.btn}>Cancel</Button>
           <Button mode="contained" onPress={saveChanges} loading={saving} style={styles.btn}>
             Save & Regenerate Plan
           </Button>
@@ -316,20 +373,65 @@ export default function ProfileScreen() {
 
       <Divider style={styles.divider} />
 
-      {/* Strava placeholder */}
+      {/* Strava Integration */}
       <Surface style={styles.stravaCard} elevation={1}>
         <Text variant="titleSmall" style={styles.stravaTitle}>Strava Integration</Text>
-        <Text style={styles.stravaDesc}>
-          Connect Strava to automatically import your runs and keep your training log in sync.
-        </Text>
-        <Button
-          mode="contained"
-          disabled
-          style={styles.stravaBtn}
-          icon="strava"
-        >
-          Connect Strava (Coming Soon)
-        </Button>
+
+        {stravaTokens ? (
+          <>
+            <View style={styles.stravaConnected}>
+              <Text style={styles.stravaAthleteLabel}>Connected as</Text>
+              <Text style={styles.stravaAthleteName}>{stravaTokens.athleteName}</Text>
+            </View>
+            {syncStatus && (
+              <Text style={styles.syncStatus}>{syncStatus}</Text>
+            )}
+            <View style={styles.stravaBtnRow}>
+              <Button
+                mode="contained"
+                onPress={() => handleSync()}
+                loading={stravaLoading}
+                style={styles.syncBtn}
+                icon="sync"
+              >
+                Sync Runs
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={handleDisconnect}
+                style={styles.disconnectBtn}
+                textColor="#dc2626"
+              >
+                Disconnect
+              </Button>
+            </View>
+            <Text style={styles.stravaNote}>
+              Garmin & Apple Watch runs sync automatically via Strava.
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.stravaDesc}>
+              Connect Strava to auto-import your runs. Works with Garmin, Apple Watch, and any Strava-connected device.
+            </Text>
+            {STRAVA_CLIENT_ID === 'YOUR_CLIENT_ID' ? (
+              <Text style={styles.stravaSetupNote}>
+                To enable: add your Strava API credentials to lib/strava.ts (see comments in that file).
+              </Text>
+            ) : (
+              <Button
+                mode="contained"
+                onPress={() => promptAsync()}
+                loading={stravaLoading || !request}
+                disabled={!request}
+                style={styles.stravaBtn}
+                icon="strava"
+              >
+                Connect Strava
+              </Button>
+            )}
+          </>
+        )}
       </Surface>
 
       <Divider style={styles.divider} />
@@ -347,12 +449,7 @@ export default function ProfileScreen() {
         </Text>
       </Surface>
 
-      <Button
-        mode="outlined"
-        onPress={confirmReset}
-        style={styles.resetBtn}
-        textColor="#dc2626"
-      >
+      <Button mode="outlined" onPress={confirmReset} style={styles.resetBtn} textColor="#dc2626">
         Reset All Data
       </Button>
     </ScrollView>
@@ -393,21 +490,35 @@ const styles = StyleSheet.create({
   btn: { flex: 1 },
   editBtn: { marginBottom: 12 },
   divider: { marginVertical: 16 },
+
   stravaCard: {
     borderRadius: 12,
     padding: 14,
-    backgroundColor: '#fff1f2',
+    backgroundColor: '#fff7ed',
     borderWidth: 1,
-    borderColor: '#fca5a5',
+    borderColor: '#fed7aa',
   },
-  stravaTitle: { fontWeight: '700', color: '#dc2626', marginBottom: 6 },
+  stravaTitle: { fontWeight: '700', color: '#c2410c', marginBottom: 8 },
   stravaDesc: { color: '#6b7280', marginBottom: 12, lineHeight: 18, fontSize: 13 },
-  stravaBtn: { backgroundColor: '#fc4c02' },
-  aboutCard: {
-    borderRadius: 12,
-    padding: 14,
-    backgroundColor: '#f0f9ff',
+  stravaSetupNote: {
+    fontSize: 12,
+    color: '#92400e',
+    backgroundColor: '#fef3c7',
+    padding: 10,
+    borderRadius: 8,
+    lineHeight: 17,
   },
+  stravaBtn: { backgroundColor: '#fc4c02' },
+  stravaConnected: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  stravaAthleteLabel: { fontSize: 12, color: '#6b7280' },
+  stravaAthleteName: { fontSize: 14, fontWeight: '700', color: '#1c1917' },
+  syncStatus: { fontSize: 12, color: '#065f46', backgroundColor: '#d1fae5', padding: 8, borderRadius: 6, marginBottom: 10 },
+  stravaBtnRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  syncBtn: { flex: 1, backgroundColor: '#fc4c02' },
+  disconnectBtn: { borderColor: '#dc2626' },
+  stravaNote: { fontSize: 11, color: '#9a3412', fontStyle: 'italic' },
+
+  aboutCard: { borderRadius: 12, padding: 14, backgroundColor: '#f0f9ff' },
   aboutTitle: { fontWeight: '700', color: '#0369a1', marginBottom: 8 },
   aboutText: { color: '#0c4a6e', lineHeight: 20, fontSize: 12 },
   resetBtn: { marginTop: 24, borderColor: '#dc2626' },
