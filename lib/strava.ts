@@ -7,8 +7,8 @@ import { loadWorkoutLog, saveWorkoutLog } from './storage';
 // 1. Go to https://www.strava.com/settings/api and create an app
 // 2. Set "Authorization Callback Domain" to "localhost"
 // 3. Paste your Client ID and Client Secret below
-export const STRAVA_CLIENT_ID = 'YOUR_CLIENT_ID';
-export const STRAVA_CLIENT_SECRET = 'YOUR_CLIENT_SECRET';
+export const STRAVA_CLIENT_ID = '260849';
+export const STRAVA_CLIENT_SECRET = '686aa50760560bf4d0bd16c65f9bd332917af7d7';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TOKENS_KEY = 'strava_tokens_v1';
