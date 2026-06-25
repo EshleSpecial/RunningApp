@@ -19,7 +19,7 @@ import type { UserProfile } from '../../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const REDIRECT_URI = AuthSession.makeRedirectUri({ scheme: 'rundisney-training' });
+const REDIRECT_URI = 'rundisney-training://localhost';
 
 const STRAVA_DISCOVERY = {
   authorizationEndpoint: 'https://www.strava.com/oauth/mobile/authorize',
