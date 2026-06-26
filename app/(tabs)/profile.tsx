@@ -15,6 +15,7 @@ import {
   syncStravaActivities,
   type StravaTokens,
 } from '../../lib/strava';
+import { useTheme } from '../../constants/theme';
 import type { UserProfile } from '../../types';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -26,6 +27,7 @@ const STRAVA_DISCOVERY = {
 };
 
 export default function ProfileScreen() {
+  const { colors } = useTheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -167,25 +169,25 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text variant="headlineSmall" style={styles.title}>Profile</Text>
-        <Text variant="bodySmall" style={styles.subtitle}>{profile.name}'s Training Journey</Text>
+        <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Profile</Text>
+        <Text variant="bodySmall" style={[styles.subtitle, { color: colors.text }]}>{profile.name}'s Training Journey</Text>
       </View>
 
-      <Surface style={styles.card} elevation={1}>
+      <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Name</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Name</Text>
           {editing ? (
-            <TextInput value={name} onChangeText={setName} mode="outlined" dense style={styles.inlineInput} />
+            <TextInput value={name} onChangeText={setName} mode="outlined" dense style={[styles.inlineInput, { backgroundColor: colors.surface }]} />
           ) : (
-            <Text style={styles.value}>{profile.name}</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{profile.name}</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Weekly mileage</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Weekly mileage</Text>
           {editing ? (
             <TextInput
               value={weeklyMiles}
@@ -193,41 +195,41 @@ export default function ProfileScreen() {
               mode="outlined"
               dense
               keyboardType="decimal-pad"
-              style={styles.inlineInput}
+              style={[styles.inlineInput, { backgroundColor: colors.surface }]}
               right={<TextInput.Affix text="mi" />}
             />
           ) : (
-            <Text style={styles.value}>{profile.currentWeeklyMiles} mi/wk</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{profile.currentWeeklyMiles} mi/wk</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Feeling level</Text>
-          <Text style={styles.value}>{profile.feelingLevel ?? '—'} / 10</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Feeling level</Text>
+          <Text style={[styles.value, { color: colors.text }]}>{profile.feelingLevel ?? '—'} / 10</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Goal type</Text>
-          <Text style={styles.value}>{(profile.goalType ?? 'general_training').replace(/_/g, ' ')}</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Goal type</Text>
+          <Text style={[styles.value, { color: colors.text }]}>{(profile.goalType ?? 'general_training').replace(/_/g, ' ')}</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Races</Text>
-          <Text style={styles.value}>{(profile.races ?? []).length} added</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Races</Text>
+          <Text style={[styles.value, { color: colors.text }]}>{(profile.races ?? []).length} added</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Injury</Text>
-          <Text style={styles.value}>{profile.injury ? profile.injury.type : 'None'}</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Injury</Text>
+          <Text style={[styles.value, { color: colors.text }]}>{profile.injury ? profile.injury.type : 'None'}</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Training days/week</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Training days/week</Text>
           {editing ? (
             <View style={styles.daysRow}>
               {[3, 4, 5, 6].map(d => (
@@ -235,7 +237,7 @@ export default function ProfileScreen() {
                   key={d}
                   mode={trainingDays === d ? 'contained' : 'outlined'}
                   onPress={() => setTrainingDays(d)}
-                  style={[styles.dayBtn, trainingDays === d && { backgroundColor: '#1e40af' }]}
+                  style={[styles.dayBtn, trainingDays === d && { backgroundColor: colors.primary }]}
                   labelStyle={[{ fontSize: 11, fontWeight: '700' }, trainingDays === d && { color: '#fff' }]}
                   contentStyle={{ paddingHorizontal: 0, minWidth: 0 }}
                 >
@@ -244,19 +246,19 @@ export default function ProfileScreen() {
               ))}
             </View>
           ) : (
-            <Text style={styles.value}>{profile.trainingDaysPerWeek ?? 5} days</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{profile.trainingDaysPerWeek ?? 5} days</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Running surface</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Running surface</Text>
           {editing ? (
             <View style={styles.envRow}>
               <Button
                 mode={!prefersTreadmill ? 'contained' : 'outlined'}
                 onPress={() => setPrefersTreadmill(false)}
-                style={[styles.envBtn, !prefersTreadmill && { backgroundColor: '#16a34a' }]}
+                style={[styles.envBtn, !prefersTreadmill && { backgroundColor: colors.success }]}
                 labelStyle={[{ fontSize: 11 }, !prefersTreadmill && { color: '#fff' }]}
                 contentStyle={{ paddingHorizontal: 6, minWidth: 0 }}
               >
@@ -265,7 +267,7 @@ export default function ProfileScreen() {
               <Button
                 mode={prefersTreadmill ? 'contained' : 'outlined'}
                 onPress={() => setPrefersTreadmill(true)}
-                style={[styles.envBtn, prefersTreadmill && { backgroundColor: '#1e40af' }]}
+                style={[styles.envBtn, prefersTreadmill && { backgroundColor: colors.primary }]}
                 labelStyle={[{ fontSize: 11 }, prefersTreadmill && { color: '#fff' }]}
                 contentStyle={{ paddingHorizontal: 6, minWidth: 0 }}
               >
@@ -273,13 +275,13 @@ export default function ProfileScreen() {
               </Button>
             </View>
           ) : (
-            <Text style={styles.value}>{(profile.prefersTreadmill ?? false) ? 'Treadmill' : 'Outdoor'}</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{(profile.prefersTreadmill ?? false) ? 'Treadmill' : 'Outdoor'}</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Easy pace</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Easy pace</Text>
           {editing ? (
             <View style={styles.paceCol}>
               {[
@@ -293,7 +295,7 @@ export default function ProfileScreen() {
                   key={opt.value}
                   mode={pace === opt.value ? 'contained' : 'outlined'}
                   onPress={() => setPace(opt.value)}
-                  style={[styles.paceBtn, pace === opt.value && { backgroundColor: '#7c3aed' }]}
+                  style={[styles.paceBtn, pace === opt.value && { backgroundColor: colors.primary }]}
                   labelStyle={[{ fontSize: 11 }, pace === opt.value && { color: '#fff' }]}
                   contentStyle={{ paddingHorizontal: 4, minWidth: 0 }}
                 >
@@ -302,13 +304,13 @@ export default function ProfileScreen() {
               ))}
             </View>
           ) : (
-            <Text style={styles.value}>{formatPace(profile.currentPaceMinPerMile ?? 13.0)}</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{formatPace(profile.currentPaceMinPerMile ?? 13.0)}</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Course terrain</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Course terrain</Text>
           {editing ? (
             <View style={styles.courseRow}>
               {(['flat', 'rolling', 'hilly', 'very_hilly'] as const).map(d => (
@@ -316,7 +318,7 @@ export default function ProfileScreen() {
                   key={d}
                   mode={courseDifficulty === d ? 'contained' : 'outlined'}
                   onPress={() => setCourseDifficulty(d)}
-                  style={[styles.courseBtn, courseDifficulty === d && { backgroundColor: '#1e40af' }]}
+                  style={[styles.courseBtn, courseDifficulty === d && { backgroundColor: colors.primary }]}
                   labelStyle={[{ fontSize: 10 }, courseDifficulty === d && { color: '#fff' }]}
                   contentStyle={{ paddingHorizontal: 2, minWidth: 0 }}
                 >
@@ -325,7 +327,7 @@ export default function ProfileScreen() {
               ))}
             </View>
           ) : (
-            <Text style={styles.value}>{(profile.raceCourseDifficulty ?? 'flat').replace('_', ' ')}</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{(profile.raceCourseDifficulty ?? 'flat').replace('_', ' ')}</Text>
           )}
         </View>
       </Surface>
@@ -333,7 +335,7 @@ export default function ProfileScreen() {
       {editing ? (
         <View style={styles.btnRow}>
           <Button mode="outlined" onPress={() => setEditing(false)} style={styles.btn}>Cancel</Button>
-          <Button mode="contained" onPress={saveChanges} loading={saving} style={styles.btn}>
+          <Button mode="contained" onPress={saveChanges} loading={saving} style={[styles.btn, { backgroundColor: colors.primary }]}>
             Save & Regenerate Plan
           </Button>
         </View>
@@ -346,24 +348,24 @@ export default function ProfileScreen() {
       <Divider style={styles.divider} />
 
       {/* Strava Integration */}
-      <Surface style={styles.stravaCard} elevation={1}>
-        <Text variant="titleSmall" style={styles.stravaTitle}>Strava Integration</Text>
+      <Surface style={[styles.stravaCard, { backgroundColor: colors.surface, borderColor: colors.accent }]} elevation={1}>
+        <Text variant="titleSmall" style={[styles.stravaTitle, { color: colors.accent }]}>Strava Integration</Text>
 
         {stravaTokens ? (
           <>
             <View style={styles.stravaConnected}>
-              <Text style={styles.stravaAthleteLabel}>Connected as</Text>
-              <Text style={styles.stravaAthleteName}>{stravaTokens.athleteName}</Text>
+              <Text style={[styles.stravaAthleteLabel, { color: colors.text }]}>Connected as</Text>
+              <Text style={[styles.stravaAthleteName, { color: colors.text }]}>{stravaTokens.athleteName}</Text>
             </View>
             {syncStatus && (
-              <Text style={styles.syncStatus}>{syncStatus}</Text>
+              <Text style={[styles.syncStatus, { color: colors.success, backgroundColor: colors.success + '22' }]}>{syncStatus}</Text>
             )}
             <View style={styles.stravaBtnRow}>
               <Button
                 mode="contained"
                 onPress={() => handleSync()}
                 loading={stravaLoading}
-                style={styles.syncBtn}
+                style={[styles.syncBtn, { backgroundColor: colors.accent }]}
                 icon="sync"
               >
                 Sync Runs
@@ -371,19 +373,19 @@ export default function ProfileScreen() {
               <Button
                 mode="outlined"
                 onPress={handleDisconnect}
-                style={styles.disconnectBtn}
-                textColor="#dc2626"
+                style={[styles.disconnectBtn, { borderColor: colors.danger }]}
+                textColor={colors.danger}
               >
                 Disconnect
               </Button>
             </View>
-            <Text style={styles.stravaNote}>
+            <Text style={[styles.stravaNote, { color: colors.accent }]}>
               Garmin & Apple Watch runs sync automatically via Strava.
             </Text>
           </>
         ) : (
           <>
-            <Text style={styles.stravaDesc}>
+            <Text style={[styles.stravaDesc, { color: colors.text }]}>
               Connect Strava to auto-import your runs. Works with Garmin, Apple Watch, and any Strava-connected device.
             </Text>
             <Button
@@ -391,7 +393,7 @@ export default function ProfileScreen() {
               onPress={() => promptAsync()}
               loading={stravaLoading || !request}
               disabled={!request}
-              style={styles.stravaBtn}
+              style={[styles.stravaBtn, { backgroundColor: colors.accent }]}
               icon="strava"
             >
               Connect Strava
@@ -403,9 +405,9 @@ export default function ProfileScreen() {
       <Divider style={styles.divider} />
 
       {/* About */}
-      <Surface style={styles.aboutCard} elevation={0}>
-        <Text variant="titleSmall" style={styles.aboutTitle}>About Your Plan</Text>
-        <Text style={styles.aboutText}>
+      <Surface style={[styles.aboutCard, { backgroundColor: colors.surface }]} elevation={0}>
+        <Text variant="titleSmall" style={[styles.aboutTitle, { color: colors.primary }]}>About Your Plan</Text>
+        <Text style={[styles.aboutText, { color: colors.text }]}>
           • Phase 1–2: Build aerobic base and establish consistent weekly mileage{'\n'}
           • Phase 3: Race-specific prep — tempo runs, long efforts, and terrain training{'\n'}
           • Phase 4: Peak and taper leading into race week{'\n'}
@@ -415,7 +417,7 @@ export default function ProfileScreen() {
         </Text>
       </Surface>
 
-      <Button mode="outlined" onPress={confirmReset} style={styles.resetBtn} textColor="#dc2626">
+      <Button mode="outlined" onPress={confirmReset} style={[styles.resetBtn, { borderColor: colors.danger }]} textColor={colors.danger}>
         Reset All Data
       </Button>
     </ScrollView>
@@ -423,13 +425,13 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f0f4ff' },
+  screen: { flex: 1 },
   content: { padding: 16, paddingTop: 56, paddingBottom: 48 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { marginBottom: 16 },
-  title: { fontWeight: '800', color: '#1e40af' },
-  subtitle: { color: '#6b7280', marginTop: 2 },
-  card: { borderRadius: 12, backgroundColor: '#fff', marginBottom: 16, overflow: 'hidden' },
+  title: { fontWeight: '800' },
+  subtitle: { marginTop: 2 },
+  card: { borderRadius: 12, marginBottom: 16, overflow: 'hidden' },
   cardRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -438,10 +440,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 8,
   },
-  label: { color: '#6b7280', fontSize: 13, flex: 1 },
-  value: { color: '#111827', fontWeight: '600', fontSize: 14 },
+  label: { fontSize: 13, flex: 1, opacity: 0.7 },
+  value: { fontWeight: '600', fontSize: 14 },
   rowDivider: { marginHorizontal: 14 },
-  inlineInput: { flex: 1.5, backgroundColor: '#fff' },
+  inlineInput: { flex: 1.5 },
   daysRow: { flexDirection: 'row', gap: 4 },
   dayBtn: { width: 40, minWidth: 0, height: 34, borderRadius: 6 },
   envRow: { flexDirection: 'row', gap: 6 },
@@ -458,24 +460,22 @@ const styles = StyleSheet.create({
   stravaCard: {
     borderRadius: 12,
     padding: 14,
-    backgroundColor: '#fff7ed',
     borderWidth: 1,
-    borderColor: '#fed7aa',
   },
-  stravaTitle: { fontWeight: '700', color: '#c2410c', marginBottom: 8 },
-  stravaDesc: { color: '#6b7280', marginBottom: 12, lineHeight: 18, fontSize: 13 },
-  stravaBtn: { backgroundColor: '#fc4c02' },
+  stravaTitle: { fontWeight: '700', marginBottom: 8 },
+  stravaDesc: { marginBottom: 12, lineHeight: 18, fontSize: 13 },
+  stravaBtn: {},
   stravaConnected: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  stravaAthleteLabel: { fontSize: 12, color: '#6b7280' },
-  stravaAthleteName: { fontSize: 14, fontWeight: '700', color: '#1c1917' },
-  syncStatus: { fontSize: 12, color: '#065f46', backgroundColor: '#d1fae5', padding: 8, borderRadius: 6, marginBottom: 10 },
+  stravaAthleteLabel: { fontSize: 12 },
+  stravaAthleteName: { fontSize: 14, fontWeight: '700' },
+  syncStatus: { fontSize: 12, padding: 8, borderRadius: 6, marginBottom: 10 },
   stravaBtnRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
-  syncBtn: { flex: 1, backgroundColor: '#fc4c02' },
-  disconnectBtn: { borderColor: '#dc2626' },
-  stravaNote: { fontSize: 11, color: '#9a3412', fontStyle: 'italic' },
+  syncBtn: { flex: 1 },
+  disconnectBtn: {},
+  stravaNote: { fontSize: 11, fontStyle: 'italic' },
 
-  aboutCard: { borderRadius: 12, padding: 14, backgroundColor: '#f0f9ff' },
-  aboutTitle: { fontWeight: '700', color: '#0369a1', marginBottom: 8 },
-  aboutText: { color: '#0c4a6e', lineHeight: 20, fontSize: 12 },
-  resetBtn: { marginTop: 24, borderColor: '#dc2626' },
+  aboutCard: { borderRadius: 12, padding: 14 },
+  aboutTitle: { fontWeight: '700', marginBottom: 8 },
+  aboutText: { lineHeight: 20, fontSize: 12 },
+  resetBtn: { marginTop: 24 },
 });

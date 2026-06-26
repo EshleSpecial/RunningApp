@@ -4,6 +4,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 're
 import { Button, ProgressBar, Surface, Text, TextInput } from 'react-native-paper';
 import { generateTrainingPlan } from '../lib/trainingPlan';
 import { saveTrainingPlan, saveUserProfile } from '../lib/storage';
+import { useTheme } from '../constants/theme';
 import type { Race, UserProfile } from '../types';
 
 const STEPS = 8;
@@ -61,6 +62,7 @@ const GOAL_OPTIONS: { value: GoalType; label: string; desc: string }[] = [
 ];
 
 export default function Onboarding() {
+  const { colors } = useTheme();
   const [step, setStep] = useState(0);
   // atRaceStep inserts the race/plan-length screen between step 6 and step 7
   const [atRaceStep, setAtRaceStep] = useState(false);
@@ -170,31 +172,31 @@ export default function Onboarding() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text variant="headlineMedium" style={styles.title}>Race Training</Text>
-          <Text variant="bodyMedium" style={styles.subtitle}>Let's build your plan</Text>
+          <Text variant="headlineMedium" style={[styles.title, { color: colors.primary }]}>Race Training</Text>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: colors.text }]}>Let's build your plan</Text>
           <ProgressBar
             progress={displayProgress}
-            color="#1a2f5a"
+            color={colors.primary}
             style={styles.progress}
           />
-          <Text style={styles.stepLabel}>Step {displayStep} of {STEPS}</Text>
+          <Text style={[styles.stepLabel, { color: colors.text }]}>Step {displayStep} of {STEPS}</Text>
         </View>
 
-        <Surface style={styles.card} elevation={2}>
+        <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={2}>
 
           {/* Step 0: Name */}
           {step === 0 && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>What's your name?</Text>
-              <Text style={styles.stepDesc}>Just so the app can cheer you on.</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>What's your name?</Text>
+              <Text style={[styles.stepDesc, { color: colors.text }]}>Just so the app can cheer you on.</Text>
               <TextInput
                 label="Your name"
                 value={name}
                 onChangeText={setName}
                 mode="outlined"
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.surface }]}
                 autoFocus
                 returnKeyType="next"
                 onSubmitEditing={next}
@@ -205,8 +207,8 @@ export default function Onboarding() {
           {/* Step 1: Weekly mileage */}
           {step === 1 && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>Current weekly mileage</Text>
-              <Text style={styles.stepDesc}>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Current weekly mileage</Text>
+              <Text style={[styles.stepDesc, { color: colors.text }]}>
                 How many miles per week are you running right now? Enter 0 if you're just starting back.
               </Text>
               <TextInput
@@ -215,7 +217,7 @@ export default function Onboarding() {
                 onChangeText={setWeeklyMiles}
                 mode="outlined"
                 keyboardType="decimal-pad"
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.surface }]}
                 autoFocus
                 right={<TextInput.Affix text="mi/wk" />}
                 returnKeyType="next"
@@ -227,8 +229,8 @@ export default function Onboarding() {
           {/* Step 2: Feeling level */}
           {step === 2 && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>How are you feeling overall?</Text>
-              <Text style={styles.stepDesc}>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>How are you feeling overall?</Text>
+              <Text style={[styles.stepDesc, { color: colors.text }]}>
                 Rate your current overall wellbeing. This helps calibrate your starting point.
               </Text>
               <View style={styles.painGrid}>
@@ -237,7 +239,7 @@ export default function Onboarding() {
                     key={n}
                     mode={feelingLevel === n ? 'contained' : 'outlined'}
                     onPress={() => setFeelingLevel(n)}
-                    style={[styles.painBtn, feelingLevel === n && { backgroundColor: feelingColor(n) }]}
+                    style={[styles.painBtn, feelingLevel === n && { backgroundColor: feelingColor(n, colors) }]}
                     labelStyle={[styles.painBtnLabel, feelingLevel === n && { color: '#fff' }]}
                     contentStyle={{ minWidth: 0, paddingHorizontal: 0 }}
                   >
@@ -245,8 +247,8 @@ export default function Onboarding() {
                   </Button>
                 ))}
               </View>
-              <Surface style={[styles.feelingLabel, { backgroundColor: feelingColor(feelingLevel) + '22' }]} elevation={0}>
-                <Text style={[styles.feelingLabelText, { color: feelingColor(feelingLevel) }]}>
+              <Surface style={[styles.feelingLabel, { backgroundColor: feelingColor(feelingLevel, colors) + '22' }]} elevation={0}>
+                <Text style={[styles.feelingLabelText, { color: feelingColor(feelingLevel, colors) }]}>
                   {feelingLevel} — {FEELING_LABELS[feelingLevel]}
                 </Text>
               </Surface>
@@ -256,8 +258,8 @@ export default function Onboarding() {
           {/* Step 3: Training days */}
           {step === 3 && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>Training days per week</Text>
-              <Text style={styles.stepDesc}>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Training days per week</Text>
+              <Text style={[styles.stepDesc, { color: colors.text }]}>
                 How many days per week can you realistically commit to training?
                 Your plan will fit within this schedule.
               </Text>
@@ -267,15 +269,15 @@ export default function Onboarding() {
                     key={d}
                     mode={trainingDays === d ? 'contained' : 'outlined'}
                     onPress={() => setTrainingDays(d)}
-                    style={[styles.dayBtn, trainingDays === d && { backgroundColor: '#1a2f5a' }]}
+                    style={[styles.dayBtn, trainingDays === d && { backgroundColor: colors.primary }]}
                     labelStyle={[styles.dayBtnLabel, trainingDays === d && { color: '#fff' }]}
                   >
                     {d} days
                   </Button>
                 ))}
               </View>
-              <Surface style={styles.daysDesc} elevation={0}>
-                <Text style={styles.daysDescText}>{daysDescription(trainingDays)}</Text>
+              <Surface style={[styles.daysDesc, { backgroundColor: colors.surface }]} elevation={0}>
+                <Text style={[styles.daysDescText, { color: colors.primary }]}>{daysDescription(trainingDays)}</Text>
               </Surface>
             </View>
           )}
@@ -283,13 +285,13 @@ export default function Onboarding() {
           {/* Step 4: Environment + pace */}
           {step === 4 && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>Your training setup</Text>
-              <Text style={styles.stepDesc}>Where will you be running most of the time?</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Your training setup</Text>
+              <Text style={[styles.stepDesc, { color: colors.text }]}>Where will you be running most of the time?</Text>
               <View style={styles.envRow}>
                 <Button
                   mode={!prefersTreadmill ? 'contained' : 'outlined'}
                   onPress={() => setPrefersTreadmill(false)}
-                  style={[styles.envBtn, !prefersTreadmill && { backgroundColor: '#16a34a' }]}
+                  style={[styles.envBtn, !prefersTreadmill && { backgroundColor: colors.success }]}
                   labelStyle={!prefersTreadmill ? { color: '#fff' } : undefined}
                   icon="weather-sunny"
                 >
@@ -298,14 +300,14 @@ export default function Onboarding() {
                 <Button
                   mode={prefersTreadmill ? 'contained' : 'outlined'}
                   onPress={() => setPrefersTreadmill(true)}
-                  style={[styles.envBtn, prefersTreadmill && { backgroundColor: '#1a2f5a' }]}
+                  style={[styles.envBtn, prefersTreadmill && { backgroundColor: colors.primary }]}
                   labelStyle={prefersTreadmill ? { color: '#fff' } : undefined}
                   icon="run-fast"
                 >
                   Treadmill
                 </Button>
               </View>
-              <Text style={[styles.stepDesc, { marginTop: 20 }]}>
+              <Text style={[styles.stepDesc, { marginTop: 20, color: colors.text }]}>
                 What's your comfortable easy running pace?
               </Text>
               <View style={styles.paceGrid}>
@@ -314,7 +316,7 @@ export default function Onboarding() {
                     key={opt.value}
                     mode={pace === opt.value ? 'contained' : 'outlined'}
                     onPress={() => setPace(opt.value)}
-                    style={[styles.paceBtn, pace === opt.value && { backgroundColor: '#7c3aed' }]}
+                    style={[styles.paceBtn, pace === opt.value && { backgroundColor: colors.primary }]}
                     labelStyle={[styles.paceBtnLabel, pace === opt.value && { color: '#fff' }]}
                   >
                     {opt.label}
@@ -322,7 +324,7 @@ export default function Onboarding() {
                 ))}
               </View>
               {prefersTreadmill && (
-                <Text style={styles.treadmillNote}>
+                <Text style={[styles.treadmillNote, { color: colors.primary, backgroundColor: colors.surface }]}>
                   Your workouts will include treadmill speed and incline recommendations.
                 </Text>
               )}
@@ -332,8 +334,8 @@ export default function Onboarding() {
           {/* Step 5: Course difficulty */}
           {step === 5 && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>Race course terrain</Text>
-              <Text style={styles.stepDesc}>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Race course terrain</Text>
+              <Text style={[styles.stepDesc, { color: colors.text }]}>
                 How hilly is your race course? Your plan will include terrain-specific training.
               </Text>
               <View style={styles.courseGrid}>
@@ -347,7 +349,7 @@ export default function Onboarding() {
                     key={opt.value}
                     mode={courseDifficulty === opt.value ? 'contained' : 'outlined'}
                     onPress={() => setCourseDifficulty(opt.value)}
-                    style={[styles.courseBtn, courseDifficulty === opt.value && { backgroundColor: '#1a2f5a' }]}
+                    style={[styles.courseBtn, courseDifficulty === opt.value && { backgroundColor: colors.primary }]}
                     labelStyle={[styles.courseBtnLabel, courseDifficulty === opt.value && { color: '#fff' }]}
                   >
                     {opt.label}
@@ -355,8 +357,8 @@ export default function Onboarding() {
                 ))}
               </View>
               {(courseDifficulty === 'hilly' || courseDifficulty === 'very_hilly') && (
-                <Surface style={styles.hillNote} elevation={0}>
-                  <Text style={styles.hillNoteText}>
+                <Surface style={[styles.hillNote, { backgroundColor: colors.surface }]} elevation={0}>
+                  <Text style={[styles.hillNoteText, { color: colors.success }]}>
                     Hill training will be added to your mid-week workouts to prepare for your course.
                   </Text>
                 </Surface>
@@ -367,14 +369,14 @@ export default function Onboarding() {
           {/* Step 6: Goal type */}
           {step === 6 && !atRaceStep && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>What's your training goal?</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>What's your training goal?</Text>
               <View style={styles.goalGrid}>
                 {GOAL_OPTIONS.map(opt => (
                   <Button
                     key={opt.value}
                     mode={goalType === opt.value ? 'contained' : 'outlined'}
                     onPress={() => setGoalType(opt.value)}
-                    style={[styles.goalBtn, goalType === opt.value && { backgroundColor: '#1a2f5a' }]}
+                    style={[styles.goalBtn, goalType === opt.value && { backgroundColor: colors.primary }]}
                     labelStyle={[styles.goalBtnLabel, goalType === opt.value && { color: '#fff' }]}
                   >
                     {opt.label}
@@ -382,7 +384,7 @@ export default function Onboarding() {
                 ))}
               </View>
               {selectedGoal && (
-                <Text style={styles.goalDesc}>{selectedGoal.desc}</Text>
+                <Text style={[styles.goalDesc, { color: colors.text }]}>{selectedGoal.desc}</Text>
               )}
             </View>
           )}
@@ -390,11 +392,11 @@ export default function Onboarding() {
           {/* Race/plan-length step (virtual, between step 6 and step 7) */}
           {atRaceStep && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>Add your race(s)</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Add your race(s)</Text>
 
               {goalType === 'no_date_plan' ? (
                 <>
-                  <Text style={styles.stepDesc}>
+                  <Text style={[styles.stepDesc, { color: colors.text }]}>
                     How many weeks would you like your training plan to be?
                   </Text>
                   <View style={styles.daysGrid}>
@@ -403,7 +405,7 @@ export default function Onboarding() {
                         key={w}
                         mode={planWeeks === w ? 'contained' : 'outlined'}
                         onPress={() => setPlanWeeks(w)}
-                        style={[styles.dayBtn, planWeeks === w && { backgroundColor: '#1a2f5a' }]}
+                        style={[styles.dayBtn, planWeeks === w && { backgroundColor: colors.primary }]}
                         labelStyle={[styles.dayBtnLabel, planWeeks === w && { color: '#fff' }]}
                       >
                         {w} wks
@@ -413,7 +415,7 @@ export default function Onboarding() {
                 </>
               ) : (
                 <>
-                  <Text style={styles.stepDesc}>
+                  <Text style={[styles.stepDesc, { color: colors.text }]}>
                     {goalType === 'multi_race'
                       ? "Add each race you're training for. You can add more later."
                       : 'Add your goal race.'}
@@ -424,25 +426,25 @@ export default function Onboarding() {
                     value={currentRaceName}
                     onChangeText={setCurrentRaceName}
                     mode="outlined"
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface }]}
                   />
                   <TextInput
                     label="Race date (yyyy-MM-dd)"
                     value={currentRaceDate}
                     onChangeText={setCurrentRaceDate}
                     mode="outlined"
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface }]}
                     placeholder="2026-10-31"
                   />
 
-                  <Text style={styles.fieldLabel}>Distance</Text>
+                  <Text style={[styles.fieldLabel, { color: colors.text }]}>Distance</Text>
                   <View style={styles.distanceGrid}>
                     {DISTANCE_OPTIONS.map(opt => (
                       <Button
                         key={opt.value}
                         mode={currentRaceDistance === opt.value ? 'contained' : 'outlined'}
                         onPress={() => setCurrentRaceDistance(opt.value)}
-                        style={[styles.distBtn, currentRaceDistance === opt.value && { backgroundColor: '#7c3aed' }]}
+                        style={[styles.distBtn, currentRaceDistance === opt.value && { backgroundColor: colors.primary }]}
                         labelStyle={[{ fontSize: 11 }, currentRaceDistance === opt.value && { color: '#fff' }]}
                         contentStyle={{ paddingHorizontal: 4, minWidth: 0 }}
                       >
@@ -458,7 +460,7 @@ export default function Onboarding() {
                       onChangeText={setCustomDistance}
                       mode="outlined"
                       keyboardType="decimal-pad"
-                      style={styles.input}
+                      style={[styles.input, { backgroundColor: colors.surface }]}
                       right={<TextInput.Affix text="mi" />}
                     />
                   )}
@@ -467,22 +469,22 @@ export default function Onboarding() {
                     mode="contained"
                     onPress={addRace}
                     disabled={!currentRaceName.trim() || !currentRaceDate.trim()}
-                    style={styles.addRaceBtn}
+                    style={[styles.addRaceBtn, { backgroundColor: colors.primary }]}
                   >
                     Add Race
                   </Button>
 
                   {races.map((race, i) => (
-                    <Surface key={race.id} style={styles.raceItem} elevation={0}>
+                    <Surface key={race.id} style={[styles.raceItem, { backgroundColor: colors.surface, borderColor: colors.primary }]} elevation={0}>
                       <View style={styles.raceItemRow}>
                         <View style={{ flex: 1 }}>
-                          <Text style={styles.raceItemName}>{race.name}</Text>
-                          <Text style={styles.raceItemDetail}>{race.date} · {race.distanceMiles} mi</Text>
+                          <Text style={[styles.raceItemName, { color: colors.primary }]}>{race.name}</Text>
+                          <Text style={[styles.raceItemDetail, { color: colors.text }]}>{race.date} · {race.distanceMiles} mi</Text>
                         </View>
                         <Button
                           mode="text"
                           onPress={() => removeRace(i)}
-                          textColor="#dc2626"
+                          textColor={colors.danger}
                           compact
                         >
                           Remove
@@ -498,12 +500,12 @@ export default function Onboarding() {
           {/* Step 7: Injury */}
           {step === 7 && !atRaceStep && (
             <View>
-              <Text variant="titleLarge" style={styles.stepTitle}>Any injuries or pain areas?</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Any injuries or pain areas?</Text>
               <View style={styles.injuryToggleRow}>
                 <Button
                   mode={hasInjury ? 'contained' : 'outlined'}
                   onPress={() => setHasInjury(true)}
-                  style={[styles.envBtn, hasInjury && { backgroundColor: '#dc2626' }]}
+                  style={[styles.envBtn, hasInjury && { backgroundColor: colors.danger }]}
                   labelStyle={hasInjury ? { color: '#fff' } : undefined}
                 >
                   Yes, I have an injury
@@ -511,7 +513,7 @@ export default function Onboarding() {
                 <Button
                   mode={!hasInjury ? 'contained' : 'outlined'}
                   onPress={() => setHasInjury(false)}
-                  style={[styles.envBtn, !hasInjury && { backgroundColor: '#16a34a' }]}
+                  style={[styles.envBtn, !hasInjury && { backgroundColor: colors.success }]}
                   labelStyle={!hasInjury ? { color: '#fff' } : undefined}
                 >
                   No, I'm good
@@ -520,14 +522,14 @@ export default function Onboarding() {
 
               {hasInjury && (
                 <>
-                  <Text style={[styles.stepDesc, { marginTop: 16 }]}>Select your injury:</Text>
+                  <Text style={[styles.stepDesc, { marginTop: 16, color: colors.text }]}>Select your injury:</Text>
                   <View style={styles.injuryGrid}>
                     {INJURY_OPTIONS.map(inj => (
                       <Button
                         key={inj}
                         mode={injuryType === inj ? 'contained' : 'outlined'}
                         onPress={() => setInjuryType(inj)}
-                        style={[styles.injuryBtn, injuryType === inj && { backgroundColor: '#1a2f5a' }]}
+                        style={[styles.injuryBtn, injuryType === inj && { backgroundColor: colors.primary }]}
                         labelStyle={[{ fontSize: 12 }, injuryType === inj && { color: '#fff' }]}
                         contentStyle={{ paddingHorizontal: 6, minWidth: 0 }}
                       >
@@ -540,11 +542,11 @@ export default function Onboarding() {
                     value={injuryNotes}
                     onChangeText={setInjuryNotes}
                     mode="outlined"
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface }]}
                     multiline
                     numberOfLines={2}
                   />
-                  <Text style={styles.injuryNote}>
+                  <Text style={[styles.injuryNote, { color: colors.text }]}>
                     Your warmups, cooldowns, and runs will be tailored to support your recovery.
                   </Text>
                 </>
@@ -565,7 +567,7 @@ export default function Onboarding() {
             onPress={next}
             disabled={!canNext || saving}
             loading={saving}
-            style={[styles.navBtn, { backgroundColor: '#1a2f5a' }]}
+            style={[styles.navBtn, { backgroundColor: colors.primary }]}
           >
             {step === STEPS - 1 && !atRaceStep ? 'Build My Plan' : 'Next'}
           </Button>
@@ -575,12 +577,12 @@ export default function Onboarding() {
   );
 }
 
-function feelingColor(n: number): string {
-  if (n <= 2) return '#16a34a';
-  if (n <= 4) return '#65a30d';
-  if (n <= 6) return '#d97706';
-  if (n <= 8) return '#ea580c';
-  return '#dc2626';
+function feelingColor(n: number, colors: { success: string; warning: string; accent: string; danger: string }): string {
+  if (n <= 2) return colors.success;
+  if (n <= 4) return colors.warning;
+  if (n <= 6) return colors.warning;
+  if (n <= 8) return colors.accent;
+  return colors.danger;
 }
 
 function daysDescription(days: number): string {
@@ -594,16 +596,16 @@ function daysDescription(days: number): string {
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 20, backgroundColor: '#f8f7f4' },
+  container: { flexGrow: 1, padding: 20 },
   header: { marginTop: 48, marginBottom: 24, alignItems: 'center' },
-  title: { fontWeight: '800', color: '#1a2f5a' },
-  subtitle: { color: '#6b7280', marginTop: 4 },
+  title: { fontWeight: '800' },
+  subtitle: { marginTop: 4 },
   progress: { width: '100%', height: 6, borderRadius: 3, marginTop: 20 },
-  stepLabel: { color: '#9ca3af', fontSize: 12, marginTop: 6 },
-  card: { borderRadius: 16, padding: 20, backgroundColor: '#ffffff', flex: 1 },
-  stepTitle: { fontWeight: '700', color: '#1a2f5a', marginBottom: 8 },
-  stepDesc: { color: '#6b7280', lineHeight: 20, marginBottom: 20 },
-  input: { marginTop: 4, marginBottom: 12, backgroundColor: '#fff' },
+  stepLabel: { fontSize: 12, marginTop: 6 },
+  card: { borderRadius: 16, padding: 20, flex: 1 },
+  stepTitle: { fontWeight: '700', marginBottom: 8 },
+  stepDesc: { lineHeight: 20, marginBottom: 20 },
+  input: { marginTop: 4, marginBottom: 12 },
   painGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 12 },
   painBtn: { width: 48, minWidth: 0 },
   painBtnLabel: { fontSize: 14, fontWeight: '700' },
@@ -612,49 +614,35 @@ const styles = StyleSheet.create({
   daysGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginVertical: 12 },
   dayBtn: { flex: 1, minWidth: 0 },
   dayBtnLabel: { fontSize: 14, fontWeight: '700' },
-  daysDesc: { borderRadius: 8, padding: 12, backgroundColor: '#e8eaf0' },
-  daysDescText: { color: '#1a2f5a', fontSize: 13, lineHeight: 18 },
+  daysDesc: { borderRadius: 8, padding: 12 },
+  daysDescText: { fontSize: 13, lineHeight: 18 },
   envRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   envBtn: { flex: 1 },
   paceGrid: { gap: 8, marginVertical: 8 },
   paceBtn: { width: '100%' },
   paceBtnLabel: { fontSize: 13 },
-  treadmillNote: {
-    color: '#1a2f5a',
-    backgroundColor: '#e8eaf0',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 12,
-    fontSize: 12,
-  },
+  treadmillNote: { borderRadius: 8, padding: 10, marginTop: 12, fontSize: 12 },
   courseGrid: { gap: 10, marginVertical: 12 },
   courseBtn: { width: '100%' },
   courseBtnLabel: { fontSize: 13 },
-  hillNote: { borderRadius: 8, padding: 12, backgroundColor: '#ecfdf5' },
-  hillNoteText: { color: '#065f46', fontSize: 13, lineHeight: 18 },
+  hillNote: { borderRadius: 8, padding: 12 },
+  hillNoteText: { fontSize: 13, lineHeight: 18 },
   goalGrid: { gap: 10, marginVertical: 12 },
   goalBtn: { width: '100%' },
   goalBtnLabel: { fontSize: 13 },
-  goalDesc: { color: '#6b7280', fontSize: 13, fontStyle: 'italic', marginTop: 4 },
+  goalDesc: { fontSize: 13, fontStyle: 'italic', marginTop: 4 },
   distanceGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
   distBtn: { minWidth: 0 },
-  addRaceBtn: { marginTop: 4, marginBottom: 16, backgroundColor: '#1a2f5a' },
-  raceItem: {
-    borderRadius: 8,
-    padding: 10,
-    backgroundColor: '#f0f4ff',
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#c7d2fe',
-  },
+  addRaceBtn: { marginTop: 4, marginBottom: 16 },
+  raceItem: { borderRadius: 8, padding: 10, marginBottom: 8, borderWidth: 1 },
   raceItemRow: { flexDirection: 'row', alignItems: 'center' },
-  raceItemName: { fontSize: 14, fontWeight: '600', color: '#1a2f5a' },
-  raceItemDetail: { fontSize: 12, color: '#6b7280', marginTop: 2 },
+  raceItemName: { fontSize: 14, fontWeight: '600' },
+  raceItemDetail: { fontSize: 12, marginTop: 2 },
   injuryToggleRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   injuryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
   injuryBtn: { minWidth: 0 },
-  injuryNote: { fontSize: 12, color: '#6b7280', fontStyle: 'italic', marginTop: 8, lineHeight: 17 },
-  fieldLabel: { color: '#374151', marginBottom: 6, fontSize: 13, fontWeight: '500' },
+  injuryNote: { fontSize: 12, fontStyle: 'italic', marginTop: 8, lineHeight: 17 },
+  fieldLabel: { marginBottom: 6, fontSize: 13, fontWeight: '500' },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 24, gap: 12 },
   navBtn: { flex: 1 },
 });

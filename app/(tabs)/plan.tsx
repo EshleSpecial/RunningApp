@@ -5,6 +5,7 @@ import { Button, Chip, Divider, Surface, Text } from 'react-native-paper';
 import WorkoutCard from '../../components/WorkoutCard';
 import { loadTrainingPlan, loadWorkoutLog } from '../../lib/storage';
 import { exportPlanToCalendar } from '../../lib/calendar';
+import { useTheme } from '../../constants/theme';
 import type { TrainingWeek, WorkoutLog } from '../../types';
 
 const TODAY = format(new Date(), 'yyyy-MM-dd');
@@ -36,6 +37,7 @@ function groupByPhase(plan: TrainingWeek[]): Section[] {
 }
 
 export default function PlanScreen() {
+  const { colors } = useTheme();
   const [plan, setPlan] = useState<TrainingWeek[]>([]);
   const [log, setLog] = useState<WorkoutLog>({});
   const [refreshing, setRefreshing] = useState(false);
@@ -72,7 +74,7 @@ export default function PlanScreen() {
 
   return (
     <SectionList
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       sections={sections}
@@ -91,15 +93,15 @@ export default function PlanScreen() {
       )}
       ListHeaderComponent={
         <View style={styles.listHeader}>
-          <Text variant="headlineSmall" style={styles.title}>Training Plan</Text>
-          <Text variant="bodySmall" style={styles.subtitle}>30 weeks · Wine & Dine → Dopey Challenge</Text>
+          <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Training Plan</Text>
+          <Text variant="bodySmall" style={[styles.subtitle, { color: colors.text }]}>30 weeks · Wine & Dine → Dopey Challenge</Text>
           <Button
             mode="outlined"
             icon="calendar-export"
             onPress={handleExportCalendar}
             loading={calExporting}
             disabled={calExporting || plan.length === 0}
-            style={styles.calBtn}
+            style={[styles.calBtn, { borderColor: colors.primary }]}
           >
             Export to Calendar
           </Button>
@@ -110,25 +112,33 @@ export default function PlanScreen() {
 }
 
 function WeekBlock({ week, log }: { week: TrainingWeek; log: WorkoutLog }) {
+  const { colors } = useTheme();
   const isCurrentWeek = week.startDate <= TODAY && TODAY <= format(parseISO(week.startDate), 'yyyy-MM-dd');
   const weekEnd = new Date(parseISO(week.startDate));
   weekEnd.setDate(weekEnd.getDate() + 6);
   const isPast = weekEnd < new Date(TODAY);
 
   return (
-    <Surface style={[styles.weekCard, isCurrentWeek && styles.currentWeek]} elevation={1}>
+    <Surface
+      style={[
+        styles.weekCard,
+        { backgroundColor: colors.surface },
+        isCurrentWeek && { borderWidth: 2, borderColor: colors.primary },
+      ]}
+      elevation={1}
+    >
       <View style={styles.weekHeader}>
-        <Text variant="labelLarge" style={styles.weekNum}>
+        <Text variant="labelLarge" style={[styles.weekNum, { color: colors.primary }]}>
           Week {week.weekNumber}
         </Text>
-        <Text variant="bodySmall" style={styles.weekDates}>
+        <Text variant="bodySmall" style={[styles.weekDates, { color: colors.text }]}>
           {format(parseISO(week.startDate), 'MMM d')} – {format(weekEnd, 'MMM d')}
         </Text>
         {isCurrentWeek && (
-          <Chip style={styles.currentChip} textStyle={styles.currentChipText}>Current</Chip>
+          <Chip style={[styles.currentChip, { backgroundColor: colors.primary }]} textStyle={[styles.currentChipText, { color: colors.surface }]}>Current</Chip>
         )}
         {week.isTaper && (
-          <Chip style={styles.taperChip} textStyle={styles.taperChipText}>Taper</Chip>
+          <Chip style={[styles.taperChip, { backgroundColor: colors.warning + '22' }]} textStyle={[styles.taperChipText, { color: colors.warning }]}>Taper</Chip>
         )}
       </View>
       <Divider style={styles.weekDivider} />
@@ -145,12 +155,12 @@ function WeekBlock({ week, log }: { week: TrainingWeek; log: WorkoutLog }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f0f4ff' },
+  screen: { flex: 1 },
   content: { paddingBottom: 32 },
   listHeader: { padding: 16, paddingTop: 56 },
-  title: { fontWeight: '800', color: '#1e40af' },
-  subtitle: { color: '#6b7280', marginTop: 4, marginBottom: 10 },
-  calBtn: { alignSelf: 'flex-start', borderColor: '#1e40af' },
+  title: { fontWeight: '800' },
+  subtitle: { marginTop: 4, marginBottom: 10 },
+  calBtn: { alignSelf: 'flex-start' },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -165,11 +175,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     borderRadius: 12,
     padding: 14,
-    backgroundColor: '#fff',
-  },
-  currentWeek: {
-    borderWidth: 2,
-    borderColor: '#1e40af',
   },
   weekHeader: {
     flexDirection: 'row',
@@ -177,11 +182,11 @@ const styles = StyleSheet.create({
     gap: 8,
     flexWrap: 'wrap',
   },
-  weekNum: { fontWeight: '700', color: '#1e40af' },
-  weekDates: { color: '#6b7280', flex: 1 },
-  currentChip: { backgroundColor: '#1e40af' },
-  currentChipText: { color: '#fff', fontSize: 10 },
-  taperChip: { backgroundColor: '#fef3c7' },
-  taperChipText: { color: '#92400e', fontSize: 10 },
+  weekNum: { fontWeight: '700' },
+  weekDates: { flex: 1 },
+  currentChip: {},
+  currentChipText: { fontSize: 10 },
+  taperChip: {},
+  taperChipText: { fontSize: 10 },
   weekDivider: { marginVertical: 10 },
 });
