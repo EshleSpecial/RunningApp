@@ -10,12 +10,22 @@ export type Phase = 1 | 2 | 3 | 4 | 5;
 
 export type CourseDifficulty = 'flat' | 'rolling' | 'hilly' | 'very_hilly';
 
+export interface Race {
+  id: string;
+  name: string;
+  date: string; // ISO date 'yyyy-MM-dd'
+  distanceMiles: number;
+  terrain?: CourseDifficulty;
+  elevationFt?: number;
+}
+
 export interface UserProfile {
   name: string;
   currentWeeklyMiles: number;
-  hipPainLevel: number; // 1–10
-  wineAndDineDate: string; // ISO date 'yyyy-MM-dd'
-  dopeyStartDate: string;  // ISO date 'yyyy-MM-dd'
+  feelingLevel: number; // 1–10
+  races: Race[];
+  goalType: 'multi_race' | 'single_race' | 'no_date_plan' | 'general_training';
+  injury?: { type: string; description?: string };
   stravaAccessToken?: string;
   onboardingComplete: boolean;
   // Phase 2

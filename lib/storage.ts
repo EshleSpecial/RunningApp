@@ -7,6 +7,7 @@ const KEYS = {
   WORKOUT_LOG: 'workout_log',
   PT_LOG: 'pt_log',
   STREAK_META: 'streak_meta',
+  RACES: 'races',
 } as const;
 
 export async function saveUserProfile(profile: UserProfile): Promise<void> {
