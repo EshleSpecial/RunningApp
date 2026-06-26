@@ -1,7 +1,7 @@
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Chip, Divider, ProgressBar, Surface, Text } from 'react-native-paper';
+import { RefreshControl, ScrollView, Slider, StyleSheet, View } from 'react-native';
+import { Chip, Divider, ProgressBar, Surface, Text } from 'react-native-paper';
 import WorkoutCard from '../../components/WorkoutCard';
 import {
   loadPTLog,
@@ -14,12 +14,12 @@ import {
 import { getDailyQuote } from '../../lib/quotes';
 import { computeStreak, getEarnedBadges } from '../../lib/streaks';
 import { patchWorkoutLogEntry, loadStreakMeta, saveStreakMeta } from '../../lib/storage';
-import type { PTLog, StreakMeta, TrainingWeek, UserProfile, Workout, WorkoutLog } from '../../types';
+import type { PTLog, Race, StreakMeta, TrainingWeek, UserProfile, Workout, WorkoutLog } from '../../types';
+import { useTheme } from '../../constants/theme';
 
 const TODAY = format(new Date(), 'yyyy-MM-dd');
 
-function daysUntil(dateStr: string | undefined): number {
-  if (!dateStr) return 0;
+function daysUntil(dateStr: string): number {
   return differenceInDays(parseISO(dateStr), new Date());
 }
 
@@ -40,13 +40,32 @@ function getTodayWorkout(week: TrainingWeek): Workout | undefined {
   return week.workouts.find(w => w.date === TODAY);
 }
 
+function feelingColor(n: number, theme: ReturnType<typeof useTheme>): string {
+  if (n <= 3) return theme.colors.success;
+  if (n <= 5) return theme.colors.warning;
+  if (n <= 7) return theme.colors.accent;
+  return theme.colors.danger;
+}
+
+function feelingNote(n: number): string {
+  if (n === 0) return 'Move the slider to check in.';
+  if (n <= 2) return `${n} – Feeling great. Let's get after it!`;
+  if (n <= 4) return `${n} – Feeling good. All systems go.`;
+  if (n <= 6) return `${n} – Feeling okay. Easy effort today.`;
+  if (n <= 8) return `${n} – Feeling rough. Consider cross-training.`;
+  return `${n} – Not great. Rest or cross-train, and take care of yourself.`;
+}
+
 export default function Dashboard() {
+  const theme = useTheme();
+  const s = makeStyles(theme);
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [plan, setPlan] = useState<TrainingWeek[]>([]);
   const [workoutLog, setWorkoutLog] = useState<WorkoutLog>({});
   const [ptLog, setPtLog] = useState<PTLog>({});
   const [streakMeta, setStreakMeta] = useState<StreakMeta>({ longestStreak: 0, totalWorkoutsCompleted: 0 });
-  const [painLevel, setPainLevel] = useState(3);
+  const [feelingLevel, setFeelingLevel] = useState(3);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
@@ -57,7 +76,7 @@ export default function Dashboard() {
       loadPTLog(),
       loadStreakMeta(),
     ]);
-    if (p) { setProfile(p); setPainLevel(p.hipPainLevel); }
+    if (p) { setProfile(p); setFeelingLevel(p.feelingLevel); }
     if (pl) setPlan(pl);
     setWorkoutLog(wl);
     setPtLog(ptl);
@@ -75,12 +94,11 @@ export default function Dashboard() {
   async function markComplete() {
     const updated: WorkoutLog = {
       ...workoutLog,
-      [TODAY]: { ...workoutLog[TODAY], completed: true, painLevelAtTime: painLevel },
+      [TODAY]: { ...workoutLog[TODAY], completed: true, painLevelAtTime: feelingLevel },
     };
     setWorkoutLog(updated);
     await saveWorkoutLog(updated);
 
-    // Update streak meta
     const newStreak = computeStreak(updated, plan);
     const newMeta: StreakMeta = {
       longestStreak: Math.max(streakMeta.longestStreak, newStreak),
@@ -101,7 +119,7 @@ export default function Dashboard() {
   async function swapToCrossTraining() {
     const updated: WorkoutLog = {
       ...workoutLog,
-      [TODAY]: { ...workoutLog[TODAY], swappedToCrossTraining: true, painLevelAtTime: painLevel },
+      [TODAY]: { ...workoutLog[TODAY], swappedToCrossTraining: true, painLevelAtTime: feelingLevel },
     };
     setWorkoutLog(updated);
     await saveWorkoutLog(updated);
@@ -109,7 +127,7 @@ export default function Dashboard() {
 
   if (!profile || plan.length === 0) {
     return (
-      <View style={styles.centered}>
+      <View style={s.centered}>
         <Text>Loading your plan…</Text>
       </View>
     );
@@ -120,8 +138,9 @@ export default function Dashboard() {
   const todayLog = workoutLog[TODAY];
   const todayPTDone = (ptLog[TODAY] ?? []).length;
 
-  const daysToWine = daysUntil(profile.wineAndDineDate);
-  const daysToDopey = daysUntil(profile.dopeyStartDate);
+  const upcomingRaces: Race[] = (profile.races ?? [])
+    .filter((r: Race) => daysUntil(r.date) >= 0)
+    .sort((a: Race, b: Race) => daysUntil(a.date) - daysUntil(b.date));
 
   const weekMilesDone = currentWeek
     ? weeklyMilesDone(plan, workoutLog, currentWeek.startDate)
@@ -133,24 +152,24 @@ export default function Dashboard() {
     : 0;
   const weekProgress = weekMilesTarget > 0 ? weekMilesDone / weekMilesTarget : 0;
 
-  const showSwap = painLevel >= 6 && todayWorkout?.type !== 'rest' && todayWorkout?.type !== 'pt_only';
+  const showSwap = feelingLevel >= 6 && todayWorkout?.type !== 'rest' && todayWorkout?.type !== 'pt_only';
 
   return (
     <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
+      style={s.screen}
+      contentContainerStyle={s.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       {/* Greeting */}
-      <View style={styles.greeting}>
-        <Text variant="headlineSmall" style={styles.greetingText}>
-          Hey, {profile.name}! 👋
+      <View style={s.greeting}>
+        <Text variant="headlineSmall" style={s.greetingText}>
+          {profile.name}
         </Text>
-        <Text variant="bodyMedium" style={styles.dateText}>
+        <Text variant="bodyMedium" style={s.dateText}>
           {format(new Date(), 'EEEE, MMMM d')}
         </Text>
         {currentWeek && (
-          <Chip style={styles.phaseChip} textStyle={styles.phaseChipText}>
+          <Chip style={s.phaseChip} textStyle={s.phaseChipText}>
             Week {currentWeek.weekNumber} · {currentWeek.phaseName}
           </Chip>
         )}
@@ -160,9 +179,9 @@ export default function Dashboard() {
       {(() => {
         const q = getDailyQuote();
         return (
-          <Surface style={styles.quoteCard} elevation={0}>
-            <Text style={styles.quoteText}>"{q.text}"</Text>
-            <Text style={styles.quoteAuthor}>— {q.author}</Text>
+          <Surface style={s.quoteCard} elevation={0}>
+            <Text style={s.quoteText}>"{q.text}"</Text>
+            <Text style={s.quoteAuthor}>— {q.author}</Text>
           </Surface>
         );
       })()}
@@ -173,76 +192,76 @@ export default function Dashboard() {
         const badges = getEarnedBadges(streak, streakMeta.longestStreak);
         if (streak === 0 && badges.length === 0) return null;
         return (
-          <Surface style={styles.streakCard} elevation={1}>
-            <View style={styles.streakRow}>
-              <Text style={styles.streakFlame}>🔥</Text>
-              <Text style={styles.streakCount}>{streak}</Text>
-              <Text style={styles.streakLabel}>day streak</Text>
+          <Surface style={s.streakCard} elevation={1}>
+            <View style={s.streakRow}>
+              <Text style={s.streakCount}>{streak}</Text>
+              <Text style={s.streakLabel}>day streak</Text>
               {badges.length > 0 && (
-                <Text style={styles.streakBadge}>{badges[badges.length - 1].emoji}</Text>
+                <Text style={s.streakBadge}>{badges[badges.length - 1].emoji}</Text>
               )}
             </View>
             {streakMeta.longestStreak > streak && (
-              <Text style={styles.streakBest}>Best: {streakMeta.longestStreak} days</Text>
+              <Text style={s.streakBest}>Best: {streakMeta.longestStreak} days</Text>
             )}
           </Surface>
         );
       })()}
 
-      {/* Countdowns */}
-      <View style={styles.countdownRow}>
-        <Surface style={[styles.countdown, { backgroundColor: '#dbeafe' }]} elevation={1}>
-          <Text style={styles.countdownNum}>{Math.max(daysToWine, 0)}</Text>
-          <Text style={styles.countdownLabel}>days to{'\n'}Wine & Dine</Text>
-        </Surface>
-        <Surface style={[styles.countdown, { backgroundColor: '#fef3c7' }]} elevation={1}>
-          <Text style={[styles.countdownNum, { color: '#92400e' }]}>{Math.max(daysToDopey, 0)}</Text>
-          <Text style={[styles.countdownLabel, { color: '#92400e' }]}>days to{'\n'}Dopey</Text>
-        </Surface>
-      </View>
+      {/* Race countdowns */}
+      {upcomingRaces.length > 0 && (
+        <View style={s.countdownRow}>
+          {upcomingRaces.slice(0, 3).map(race => (
+            <Surface key={race.id} style={s.countdown} elevation={1}>
+              <Text style={s.countdownNum}>{daysUntil(race.date)}</Text>
+              <Text style={s.countdownLabel} numberOfLines={2}>{race.name}</Text>
+            </Surface>
+          ))}
+        </View>
+      )}
 
       {/* Weekly mileage progress */}
-      <Surface style={styles.card} elevation={1}>
-        <View style={styles.cardHeader}>
-          <Text variant="titleSmall" style={styles.cardTitle}>This Week's Mileage</Text>
-          <Text variant="bodySmall" style={styles.milesText}>
+      <Surface style={s.card} elevation={1}>
+        <View style={s.cardHeader}>
+          <Text variant="titleSmall" style={s.cardTitle}>This Week's Mileage</Text>
+          <Text variant="bodySmall" style={s.milesText}>
             {weekMilesDone.toFixed(1)} / {weekMilesTarget.toFixed(1)} mi
           </Text>
         </View>
-        <ProgressBar progress={Math.min(weekProgress, 1)} color="#1e40af" style={styles.progressBar} />
+        <ProgressBar progress={Math.min(weekProgress, 1)} color={theme.colors.primary} style={s.progressBar} />
       </Surface>
 
-      {/* Hip pain check-in */}
-      <Surface style={styles.card} elevation={1}>
-        <Text variant="titleSmall" style={styles.cardTitle}>How are your hips today?</Text>
-        <View style={styles.painRow}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-            <Button
-              key={n}
-              mode={painLevel === n ? 'contained' : 'outlined'}
-              onPress={() => setPainLevel(n)}
-              style={[styles.painBtn, painLevel === n && { backgroundColor: painBtnColor(n) }]}
-              labelStyle={[{ fontSize: 11, fontWeight: '700' }, painLevel === n && { color: '#fff' }]}
-              contentStyle={{ paddingHorizontal: 0, minWidth: 0 }}
-            >
-              {String(n)}
-            </Button>
-          ))}
+      {/* Feeling check-in */}
+      <Surface style={s.card} elevation={1}>
+        <Text variant="titleSmall" style={s.cardTitle}>How are you feeling today?</Text>
+        <Slider
+          minimumValue={0}
+          maximumValue={10}
+          step={1}
+          value={feelingLevel}
+          onValueChange={setFeelingLevel}
+          minimumTrackTintColor={feelingColor(feelingLevel, theme)}
+          maximumTrackTintColor={theme.colors.background}
+          thumbTintColor={feelingColor(feelingLevel, theme)}
+          style={s.slider}
+        />
+        <View style={s.sliderLabels}>
+          <Text style={s.sliderEndLabel}>0</Text>
+          <Text style={[s.feelingNote, { color: feelingColor(feelingLevel, theme) }]}>
+            {feelingNote(feelingLevel)}
+          </Text>
+          <Text style={s.sliderEndLabel}>10</Text>
         </View>
-        <Text style={[styles.painNote, { color: painBtnColor(painLevel) }]}>
-          {painLevelNote(painLevel)}
-        </Text>
         {showSwap && (
-          <Text style={styles.swapHint}>
-            Pain is high — consider swapping today's run for cross-training below.
+          <Text style={s.swapHint}>
+            Feeling rough — consider swapping today's run for cross-training below.
           </Text>
         )}
       </Surface>
 
-      <Divider style={styles.divider} />
+      <Divider style={s.divider} />
 
       {/* Today's workout */}
-      <Text variant="titleMedium" style={styles.sectionTitle}>Today's Workout</Text>
+      <Text variant="titleMedium" style={s.sectionTitle}>Today's Workout</Text>
       {todayWorkout ? (
         <WorkoutCard
           workout={todayWorkout}
@@ -255,16 +274,16 @@ export default function Dashboard() {
           onSaveRunData={saveRunData}
         />
       ) : (
-        <Surface style={styles.card} elevation={1}>
-          <Text style={styles.noWorkout}>No workout scheduled for today. Rest up!</Text>
+        <Surface style={s.card} elevation={1}>
+          <Text style={s.noWorkout}>No workout scheduled for today. Rest up!</Text>
         </Surface>
       )}
 
       {/* PT nudge */}
       {todayPTDone < 3 && (
-        <Surface style={styles.ptNudge} elevation={1}>
-          <Text style={styles.ptNudgeText}>
-            💪 Don't forget your hip PT exercises today! ({todayPTDone} done)
+        <Surface style={s.ptNudge} elevation={1}>
+          <Text style={s.ptNudgeText}>
+            Don't forget your PT exercises today! ({todayPTDone} done)
           </Text>
         </Surface>
       )}
@@ -272,95 +291,94 @@ export default function Dashboard() {
   );
 }
 
-function painBtnColor(n: number): string {
-  if (n <= 3) return '#16a34a';
-  if (n <= 5) return '#d97706';
-  if (n <= 7) return '#ea580c';
-  return '#dc2626';
+function makeStyles(theme: ReturnType<typeof useTheme>) {
+  return StyleSheet.create({
+    screen: { flex: 1, backgroundColor: theme.colors.background },
+    content: { padding: theme.spacing.md, paddingTop: 56, paddingBottom: 32 },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    greeting: { marginBottom: theme.spacing.md },
+    greetingText: { fontWeight: '800', color: theme.colors.primary },
+    dateText: { color: theme.colors.text, opacity: 0.6, marginTop: 2 },
+    phaseChip: { alignSelf: 'flex-start', marginTop: theme.spacing.sm, backgroundColor: theme.colors.surface },
+    phaseChipText: { color: theme.colors.primary, fontSize: theme.typography.xs },
+    countdownRow: { flexDirection: 'row', gap: theme.spacing.sm, marginBottom: theme.spacing.md },
+    countdown: {
+      flex: 1,
+      borderRadius: theme.borderRadius.md,
+      padding: 14,
+      alignItems: 'center',
+      backgroundColor: theme.colors.surface,
+    },
+    countdownNum: { fontSize: 36, fontWeight: '900', color: theme.colors.primary },
+    countdownLabel: { fontSize: theme.typography.xs, color: theme.colors.text, textAlign: 'center', marginTop: 2, opacity: 0.7 },
+    card: { borderRadius: theme.borderRadius.md, padding: 14, backgroundColor: theme.colors.surface, marginBottom: 12 },
+    cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+    cardTitle: { fontWeight: '700', color: theme.colors.text },
+    milesText: { color: theme.colors.text, opacity: 0.6 },
+    progressBar: { height: 8, borderRadius: 4 },
+    slider: { marginVertical: theme.spacing.sm },
+    sliderLabels: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    sliderEndLabel: { fontSize: theme.typography.xs, color: theme.colors.text, opacity: 0.5, width: 16, textAlign: 'center' },
+    feelingNote: { fontSize: theme.typography.sm, fontWeight: '600', flex: 1, textAlign: 'center' },
+    swapHint: {
+      color: theme.colors.warning,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.sm,
+      borderWidth: 1,
+      borderColor: theme.colors.warning,
+      padding: theme.spacing.sm,
+      marginTop: theme.spacing.sm,
+      fontSize: theme.typography.sm,
+    },
+    divider: { marginVertical: 12 },
+    sectionTitle: { fontWeight: '700', color: theme.colors.text, marginBottom: 8 },
+    noWorkout: { color: theme.colors.text, opacity: 0.6, textAlign: 'center', paddingVertical: 8 },
+    ptNudge: {
+      borderRadius: theme.borderRadius.md,
+      padding: 14,
+      backgroundColor: theme.colors.surface,
+      marginTop: 12,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.accent,
+    },
+    ptNudgeText: { color: theme.colors.accent, fontWeight: '600' },
+    quoteCard: {
+      borderRadius: theme.borderRadius.md,
+      padding: 14,
+      backgroundColor: theme.colors.surface,
+      marginBottom: theme.spacing.md,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.primary,
+    },
+    quoteText: {
+      color: theme.colors.text,
+      fontSize: theme.typography.sm,
+      fontStyle: 'italic',
+      lineHeight: 19,
+    },
+    quoteAuthor: {
+      color: theme.colors.primary,
+      fontSize: theme.typography.xs,
+      fontWeight: '600',
+      marginTop: 6,
+      textAlign: 'right',
+    },
+    streakCard: {
+      borderRadius: theme.borderRadius.md,
+      padding: 12,
+      backgroundColor: theme.colors.surface,
+      marginBottom: 12,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.accent,
+    },
+    streakRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    streakCount: { fontSize: 28, fontWeight: '900', color: theme.colors.accent },
+    streakLabel: { fontSize: theme.typography.sm, color: theme.colors.text, fontWeight: '600', flex: 1 },
+    streakBadge: { fontSize: 24 },
+    streakBest: { fontSize: theme.typography.xs, color: theme.colors.accent, marginTop: 2 },
+  });
 }
-
-function painLevelNote(n: number): string {
-  if (n === 1) return '1 – No pain. Perfect running day!';
-  if (n <= 3) return `${n} – Mild. All systems go.`;
-  if (n <= 5) return `${n} – Moderate. Listen to your body; easy effort only.`;
-  if (n <= 7) return `${n} – Significant. Consider cross-training today.`;
-  return `${n} – High pain. Cross-train or rest, and check with your PT.`;
-}
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f0f4ff' },
-  content: { padding: 16, paddingTop: 56, paddingBottom: 32 },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  greeting: { marginBottom: 16 },
-  greetingText: { fontWeight: '800', color: '#1e40af' },
-  dateText: { color: '#6b7280', marginTop: 2 },
-  phaseChip: { alignSelf: 'flex-start', marginTop: 8, backgroundColor: '#dbeafe' },
-  phaseChipText: { color: '#1e40af', fontSize: 11 },
-  countdownRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
-  countdown: {
-    flex: 1,
-    borderRadius: 12,
-    padding: 14,
-    alignItems: 'center',
-  },
-  countdownNum: { fontSize: 36, fontWeight: '900', color: '#1e40af' },
-  countdownLabel: { fontSize: 11, color: '#3730a3', textAlign: 'center', marginTop: 2 },
-  card: { borderRadius: 12, padding: 14, backgroundColor: '#fff', marginBottom: 12 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  cardTitle: { fontWeight: '700', color: '#374151' },
-  milesText: { color: '#6b7280' },
-  progressBar: { height: 8, borderRadius: 4 },
-  painRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginVertical: 10 },
-  painBtn: { width: 40, minWidth: 0, height: 36, borderRadius: 8 },
-  painNote: { fontSize: 12, fontWeight: '600', marginTop: 4 },
-  swapHint: { color: '#b45309', backgroundColor: '#fef3c7', borderRadius: 8, padding: 8, marginTop: 8, fontSize: 12 },
-  divider: { marginVertical: 12 },
-  sectionTitle: { fontWeight: '700', color: '#374151', marginBottom: 8 },
-  noWorkout: { color: '#6b7280', textAlign: 'center', paddingVertical: 8 },
-  ptNudge: {
-    borderRadius: 12,
-    padding: 14,
-    backgroundColor: '#f5f3ff',
-    marginTop: 12,
-  },
-  ptNudgeText: { color: '#5b21b6', fontWeight: '600' },
-  quoteCard: {
-    borderRadius: 12,
-    padding: 14,
-    backgroundColor: '#f0f9ff',
-    marginBottom: 16,
-    borderLeftWidth: 3,
-    borderLeftColor: '#38bdf8',
-  },
-  quoteText: {
-    color: '#0c4a6e',
-    fontSize: 13,
-    fontStyle: 'italic',
-    lineHeight: 19,
-  },
-  quoteAuthor: {
-    color: '#0369a1',
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: 6,
-    textAlign: 'right',
-  },
-  streakCard: {
-    borderRadius: 12,
-    padding: 12,
-    backgroundColor: '#fff7ed',
-    marginBottom: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: '#f97316',
-  },
-  streakRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  streakFlame: { fontSize: 22 },
-  streakCount: { fontSize: 28, fontWeight: '900', color: '#c2410c' },
-  streakLabel: { fontSize: 13, color: '#9a3412', fontWeight: '600', flex: 1 },
-  streakBadge: { fontSize: 24 },
-  streakBest: { fontSize: 11, color: '#c2410c', marginTop: 2 },
-});
