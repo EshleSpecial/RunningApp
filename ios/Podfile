@@ -68,12 +68,15 @@ target 'RunDisneyTraining' do
     end
 
     # Patch folly Expected.h: remove coroutine #include that references a missing header
-    folly_expected = "#{installer.sandbox.root}/RNReactNativeDependencies/folly/Expected.h"
-    folly_expected = Dir.glob("#{installer.sandbox.root}/**/folly/Expected.h").first unless File.exist?(folly_expected)
-    if folly_expected && File.exist?(folly_expected) && File.writable?(folly_expected)
-      content = File.read(folly_expected)
-      patched = content.gsub(/#include\s*<folly\/coro\/Coroutine\.h>/, '// coroutine include removed by Podfile patch')
-      File.write(folly_expected, patched) if patched != content
+    Dir.glob("#{installer.sandbox.root}/**/folly/Expected.h").each do |folly_expected|
+      next unless File.exist?(folly_expected)
+      begin
+        content = File.read(folly_expected)
+        patched = content.gsub(/#include\s*<folly\/coro\/Coroutine\.h>/, '// coroutine include removed by Podfile patch')
+        File.write(folly_expected, patched) if patched != content
+      rescue Errno::EACCES
+        next
+      end
     end
 
     # Patch react-native-screens to remove reference to removed parentShadowView field
