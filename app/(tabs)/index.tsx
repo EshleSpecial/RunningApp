@@ -1,8 +1,7 @@
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import SliderRNC from '@react-native-community/slider';
-const Slider = SliderRNC as any;
+import Slider from '@react-native-community/slider';
 import { Chip, Divider, ProgressBar, Surface, Text } from 'react-native-paper';
 import WorkoutCard from '../../components/WorkoutCard';
 import {
