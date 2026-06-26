@@ -76,9 +76,9 @@ export default function PlanScreen() {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       sections={sections}
-      keyExtractor={item => item.startDate}
+      keyExtractor={(item: TrainingWeek) => item.startDate}
       stickySectionHeadersEnabled
-      renderSectionHeader={({ section }) => (
+      renderSectionHeader={({ section }: { section: { phase: number; phaseName: string; data: TrainingWeek[] } }) => (
         <View style={[styles.sectionHeader, { backgroundColor: PHASE_COLORS[section.phase] + '22' }]}>
           <View style={[styles.phaseBar, { backgroundColor: PHASE_COLORS[section.phase] }]} />
           <Text style={[styles.phaseName, { color: PHASE_COLORS[section.phase] }]}>
@@ -86,7 +86,7 @@ export default function PlanScreen() {
           </Text>
         </View>
       )}
-      renderItem={({ item: week }) => (
+      renderItem={({ item: week }: { item: TrainingWeek }) => (
         <WeekBlock week={week} log={log} />
       )}
       ListHeaderComponent={

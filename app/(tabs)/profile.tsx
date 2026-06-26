@@ -386,22 +386,16 @@ export default function ProfileScreen() {
             <Text style={styles.stravaDesc}>
               Connect Strava to auto-import your runs. Works with Garmin, Apple Watch, and any Strava-connected device.
             </Text>
-            {STRAVA_CLIENT_ID === 'YOUR_CLIENT_ID' ? (
-              <Text style={styles.stravaSetupNote}>
-                To enable: add your Strava API credentials to lib/strava.ts (see comments in that file).
-              </Text>
-            ) : (
-              <Button
-                mode="contained"
-                onPress={() => promptAsync()}
-                loading={stravaLoading || !request}
-                disabled={!request}
-                style={styles.stravaBtn}
-                icon="strava"
-              >
-                Connect Strava
-              </Button>
-            )}
+            <Button
+              mode="contained"
+              onPress={() => promptAsync()}
+              loading={stravaLoading || !request}
+              disabled={!request}
+              style={styles.stravaBtn}
+              icon="strava"
+            >
+              Connect Strava
+            </Button>
           </>
         )}
       </Surface>
@@ -470,14 +464,6 @@ const styles = StyleSheet.create({
   },
   stravaTitle: { fontWeight: '700', color: '#c2410c', marginBottom: 8 },
   stravaDesc: { color: '#6b7280', marginBottom: 12, lineHeight: 18, fontSize: 13 },
-  stravaSetupNote: {
-    fontSize: 12,
-    color: '#92400e',
-    backgroundColor: '#fef3c7',
-    padding: 10,
-    borderRadius: 8,
-    lineHeight: 17,
-  },
   stravaBtn: { backgroundColor: '#fc4c02' },
   stravaConnected: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   stravaAthleteLabel: { fontSize: 12, color: '#6b7280' },
