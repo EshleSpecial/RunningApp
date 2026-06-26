@@ -88,7 +88,7 @@ export default function WorkoutCard({
 
   return (
     <Card
-      style={[styles.card, { borderLeftColor: config.color, opacity: completed ? 0.6 : 1 }]}
+      style={[styles.card, { borderLeftColor: config.color, opacity: completed ? 0.6 : 1, backgroundColor: colors.surface }]}
       mode="elevated"
     >
       <Card.Content>

@@ -30,13 +30,13 @@ export default function PTExerciseCard({ exercise, completed, onToggle }: Props)
               variant="titleSmall"
               style={[
                 styles.name,
-                { color: completed ? colors.text + '88' : colors.primary },
+                { color: colors.text },
                 completed && styles.completedName,
               ]}
             >
               {exercise.name}
             </Text>
-            <Text variant="bodySmall" style={{ color: colors.primary + 'cc', marginTop: 2 }}>
+            <Text variant="bodySmall" style={{ color: colors.text + '88', marginTop: 2 }}>
               {setsReps}
             </Text>
           </View>

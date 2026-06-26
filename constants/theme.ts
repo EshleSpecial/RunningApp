@@ -58,7 +58,6 @@ interface ThemeTokens {
 
 export function useTheme(): ThemeTokens {
   const scheme = useColorScheme();
-  console.log('Color scheme:', scheme);
   const dark = scheme === 'dark';
 
   return {

@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
-import { PaperProvider, MD3LightTheme, configureFonts } from 'react-native-paper';
+import { useColorScheme } from 'react-native';
+import { PaperProvider, MD3LightTheme, MD3DarkTheme, configureFonts } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const fontConfig = {
@@ -20,19 +21,34 @@ const fontConfig = {
   bodySmall: { fontFamily: 'System', fontSize: 12, fontWeight: '400' as const, letterSpacing: 0.4, lineHeight: 16 },
 };
 
-const theme = {
+const lightTheme = {
   ...MD3LightTheme,
   fonts: configureFonts({ config: fontConfig }),
   colors: {
     ...MD3LightTheme.colors,
-    primary: '#1e40af',
-    secondary: '#d97706',
+    primary: '#1a2f5a',
+    secondary: '#E8832A',
     primaryContainer: '#dbeafe',
     secondaryContainer: '#fef3c7',
   },
 };
 
+const darkTheme = {
+  ...MD3DarkTheme,
+  fonts: configureFonts({ config: fontConfig }),
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: '#1a2f5a',
+    secondary: '#E8832A',
+    primaryContainer: '#1e3a5f',
+    secondaryContainer: '#7c4a00',
+  },
+};
+
 export default function RootLayout() {
+  const scheme = useColorScheme();
+  const theme = scheme === 'dark' ? darkTheme : lightTheme;
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PaperProvider theme={theme}>
