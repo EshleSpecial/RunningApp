@@ -152,7 +152,7 @@ export default function ProfileScreen() {
   function confirmReset() {
     Alert.alert(
       'Reset All Data',
-      "This will delete your profile and training plan. You'll go through onboarding again.",
+      "This will delete your profile and training plan. You\'ll go through onboarding again.",
       [
         { text: 'Cancel', style: 'cancel' },
         {
