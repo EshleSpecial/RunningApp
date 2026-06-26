@@ -59,10 +59,11 @@ target 'RunDisneyTraining' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => ccache_enabled?(podfile_properties),
     )
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
-      end
+    # Patch fmt headers to disable consteval (incompatible with this Clang version)
+    Dir.glob("#{installer.sandbox.root}/fmt/include/fmt/*.h").each do |header|
+      content = File.read(header)
+      patched = content.gsub(/^(#\s*define\s+FMT_USE_CONSTEVAL)\s+1/, '\1 0')
+      File.write(header, patched) if patched != content
     end
   end
 end
