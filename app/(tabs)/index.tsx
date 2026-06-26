@@ -208,15 +208,40 @@ export default function Dashboard() {
       })()}
 
       {/* Race countdowns */}
-      {upcomingRaces.length > 0 && (
-        <View style={s.countdownRow}>
-          {upcomingRaces.slice(0, 3).map(race => (
-            <Surface key={race.id} style={s.countdown} elevation={1}>
-              <Text style={s.countdownNum}>{daysUntil(race.date)}</Text>
-              <Text style={s.countdownLabel} numberOfLines={2}>{race.name}</Text>
-            </Surface>
-          ))}
+      {upcomingRaces.length > 0 ? (
+        <View style={s.countdownSection}>
+          <Text variant="titleSmall" style={s.sectionLabel}>Race Countdowns</Text>
+          <View style={s.countdownRow}>
+            {upcomingRaces.slice(0, 3).map(race => {
+              const days = daysUntil(race.date);
+              const isToday = days === 0;
+              return (
+                <Surface key={race.id} style={[s.countdown, isToday && s.countdownToday]} elevation={1}>
+                  {isToday ? (
+                    <Text style={s.countdownRaceDay}>RACE{'\n'}DAY</Text>
+                  ) : (
+                    <>
+                      <Text style={s.countdownNum}>{days}</Text>
+                      <Text style={s.countdownDaysLabel}>days</Text>
+                    </>
+                  )}
+                  <Text style={[s.countdownLabel, isToday && s.countdownLabelToday]} numberOfLines={2}>
+                    {race.name}
+                  </Text>
+                  {race.distanceMiles > 0 && (
+                    <Text style={s.countdownDist}>{race.distanceMiles} mi</Text>
+                  )}
+                </Surface>
+              );
+            })}
+          </View>
         </View>
+      ) : (
+        profile.goalType !== 'general_training' && (
+          <Surface style={s.noRacesCard} elevation={0}>
+            <Text style={s.noRacesText}>No upcoming races. Add one in your profile to see countdowns here.</Text>
+          </Surface>
+        )
       )}
 
       {/* Weekly mileage progress */}
@@ -300,16 +325,33 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     dateText: { color: theme.colors.text, opacity: 0.6, marginTop: 2 },
     phaseChip: { alignSelf: 'flex-start', marginTop: theme.spacing.sm, backgroundColor: theme.colors.surface },
     phaseChipText: { color: theme.colors.primary, fontSize: theme.typography.xs },
-    countdownRow: { flexDirection: 'row', gap: theme.spacing.sm, marginBottom: theme.spacing.md },
+    countdownSection: { marginBottom: theme.spacing.md },
+    sectionLabel: { fontWeight: '700', color: theme.colors.text, marginBottom: theme.spacing.sm },
+    countdownRow: { flexDirection: 'row', gap: theme.spacing.sm },
     countdown: {
       flex: 1,
       borderRadius: theme.borderRadius.md,
-      padding: 14,
+      padding: 12,
       alignItems: 'center',
       backgroundColor: theme.colors.surface,
     },
-    countdownNum: { fontSize: 36, fontWeight: '900', color: theme.colors.primary },
-    countdownLabel: { fontSize: theme.typography.xs, color: theme.colors.text, textAlign: 'center', marginTop: 2, opacity: 0.7 },
+    countdownToday: {
+      borderWidth: 2,
+      borderColor: theme.colors.accent,
+    },
+    countdownNum: { fontSize: 34, fontWeight: '900', color: theme.colors.primary, lineHeight: 36 },
+    countdownDaysLabel: { fontSize: theme.typography.xs, color: theme.colors.primary, fontWeight: '700', opacity: 0.7, marginTop: -2 },
+    countdownRaceDay: { fontSize: 16, fontWeight: '900', color: theme.colors.accent, textAlign: 'center', lineHeight: 18 },
+    countdownLabel: { fontSize: theme.typography.xs, color: theme.colors.text, textAlign: 'center', marginTop: 4, opacity: 0.7 },
+    countdownLabelToday: { color: theme.colors.accent, opacity: 1, fontWeight: '700' },
+    countdownDist: { fontSize: theme.typography.xs, color: theme.colors.primary, fontWeight: '600', marginTop: 2 },
+    noRacesCard: {
+      borderRadius: theme.borderRadius.md,
+      padding: 12,
+      backgroundColor: theme.colors.surface,
+      marginBottom: theme.spacing.md,
+    },
+    noRacesText: { color: theme.colors.text, opacity: 0.5, fontSize: theme.typography.sm, textAlign: 'center' },
     card: { borderRadius: theme.borderRadius.md, padding: 14, backgroundColor: theme.colors.surface, marginBottom: 12 },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
     cardTitle: { fontWeight: '700', color: theme.colors.text },
