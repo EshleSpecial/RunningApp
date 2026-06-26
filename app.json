@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "scheme": "rundisney-training",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "backgroundColor": "#1e40af"
     },
