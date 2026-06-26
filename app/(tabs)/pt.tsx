@@ -86,7 +86,7 @@ export default function PTScreen() {
         {completedCount === totalCount && totalCount > 0 && (
           <Surface style={[styles.allDoneBanner, { backgroundColor: colors.success + '22' }]} elevation={0}>
             <Text style={[styles.allDoneText, { color: colors.success }]}>
-              🎉 All exercises complete! Great work!
+              All exercises complete! Great work!
             </Text>
           </Surface>
         )}

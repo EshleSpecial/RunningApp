@@ -60,7 +60,6 @@ export default function ProgressScreen() {
       <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
         <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.text }]}>Current Streak</Text>
         <View style={styles.streakRow}>
-          <Text style={styles.streakFlame}>🔥</Text>
           <Text style={[styles.streakNum, { color: colors.accent }]}>{streak}</Text>
           <Text style={[styles.streakDays, { color: colors.accent }]}>days</Text>
         </View>
@@ -92,7 +91,7 @@ export default function ProgressScreen() {
                 ]}
               >
                 <Text style={[styles.badgeEmoji, !isEarned && styles.badgeEmojiLocked]}>
-                  {isEarned ? badge.emoji : '🔒'}
+                  {isEarned ? badge.emoji : ''}
                 </Text>
                 <Text style={[styles.badgeLabel, { color: isEarned ? colors.warning : colors.text + '66' }]}>
                   {badge.label}
@@ -121,7 +120,7 @@ export default function ProgressScreen() {
         ))}
         {!basedOnActual && (
           <Text style={[styles.predHint, { color: colors.text + 'aa' }]}>
-            💡 Log your actual pace after runs to improve predictions.
+            Log your actual pace after runs to improve predictions.
           </Text>
         )}
       </Surface>
@@ -145,7 +144,7 @@ export default function ProgressScreen() {
       {paceHistory.length === 0 && (
         <Surface style={[styles.card, styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.text + '22' }]} elevation={0}>
           <Text style={[styles.emptyText, { color: colors.text + 'aa' }]}>
-            🏃 Complete runs and log your pace to see it here.
+            Complete runs and log your pace to see it here.
           </Text>
         </Surface>
       )}
@@ -163,7 +162,6 @@ const styles = StyleSheet.create({
   divider: { marginVertical: 8 },
 
   streakRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginBottom: 14 },
-  streakFlame: { fontSize: 36 },
   streakNum: { fontSize: 52, fontWeight: '900', lineHeight: 58 },
   streakDays: { fontSize: 18, fontWeight: '600' },
   streakStats: { flexDirection: 'row', alignItems: 'center' },

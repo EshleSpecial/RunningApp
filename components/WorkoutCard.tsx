@@ -6,13 +6,13 @@ import PostRunLogger from './PostRunLogger';
 import { useTheme } from '../constants/theme';
 import type { Workout, WorkoutLogEntry } from '../types';
 
-const TYPE_CONFIG: Record<string, { label: string; color: string; emoji: string }> = {
-  easy_run:    { label: 'Easy Run',          color: '#16a34a', emoji: '🏃' },
-  long_run:    { label: 'Long Run',           color: '#2563eb', emoji: '🏃' },
-  cross_train: { label: 'Cross-Train',        color: '#d97706', emoji: '🚴' },
-  pt_only:     { label: 'Injury & Recovery',  color: '#7c3aed', emoji: '💪' },
-  rest:        { label: 'Rest Day',           color: '#6b7280', emoji: '😴' },
-  race:        { label: 'RACE DAY',           color: '#dc2626', emoji: '🏅' },
+const TYPE_CONFIG: Record<string, { label: string; color: string }> = {
+  easy_run:    { label: 'Easy Run',          color: '#16a34a' },
+  long_run:    { label: 'Long Run',           color: '#2563eb' },
+  cross_train: { label: 'Cross-Train',        color: '#d97706' },
+  pt_only:     { label: 'Injury & Recovery',  color: '#7c3aed' },
+  rest:        { label: 'Rest Day',           color: '#6b7280' },
+  race:        { label: 'RACE DAY',           color: '#dc2626' },
 };
 
 const WARMUP_STEPS = [
@@ -74,7 +74,6 @@ export default function WorkoutCard({
   const swapped = logEntry?.swappedToCrossTraining ?? false;
 
   const displayLabel = swapped ? 'Cross-Train (swapped)' : config.label;
-  const displayEmoji = swapped ? '🚴' : config.emoji;
 
   const subtitleParts: string[] = [];
   if (workout.distanceMiles) subtitleParts.push(`${workout.distanceMiles} mi`);
@@ -95,7 +94,6 @@ export default function WorkoutCard({
       <Card.Content>
         <View style={styles.header}>
           <View style={styles.titleRow}>
-            <Text style={styles.emoji}>{displayEmoji}</Text>
             <View>
               <Text variant="titleMedium" style={{ color: config.color, fontWeight: '700' }}>
                 {displayLabel}
@@ -122,7 +120,7 @@ export default function WorkoutCard({
             {treadmill && (
               <View style={[styles.treadmillBox, { backgroundColor: colors.success + '18' }]}>
                 <Text style={[styles.treadmillText, { color: colors.success }]}>
-                  🏃 Treadmill: {treadmill.speedMph} mph · {treadmill.inclinePct}% incline
+                  Treadmill: {treadmill.speedMph} mph · {treadmill.inclinePct}% incline
                 </Text>
               </View>
             )}
@@ -131,7 +129,7 @@ export default function WorkoutCard({
             {fuelingPlan && (
               <View style={[styles.fuelingBox, { backgroundColor: colors.warning + '18', borderLeftColor: colors.warning }]}>
                 <Text style={[styles.fuelingTitle, { color: colors.warning }]}>
-                  🍯 Fueling: {fuelingPlan.gelsNeeded} gel{fuelingPlan.gelsNeeded !== 1 ? 's' : ''}
+                  Fueling: {fuelingPlan.gelsNeeded} gel{fuelingPlan.gelsNeeded !== 1 ? 's' : ''}
                 </Text>
                 <Text style={[styles.fuelingDetail, { color: colors.text }]}>
                   Take at: {fuelingPlan.gelScheduleMin.map(m => `${m} min`).join(', ')}
@@ -149,7 +147,7 @@ export default function WorkoutCard({
                   style={[styles.accordionHeader, { backgroundColor: colors.text + '08' }]}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.accordionTitle, { color: colors.text }]}>🔥 Warmup</Text>
+                  <Text style={[styles.accordionTitle, { color: colors.text }]}>Warmup</Text>
                   <Text style={[styles.accordionChevron, { color: colors.text + 'aa' }]}>{warmupOpen ? '▲' : '▼'}</Text>
                 </TouchableOpacity>
                 {warmupOpen && (
@@ -170,7 +168,7 @@ export default function WorkoutCard({
                   style={[styles.accordionHeader, { backgroundColor: colors.text + '08' }]}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.accordionTitle, { color: colors.text }]}>🧘 Cooldown & Rollout</Text>
+                  <Text style={[styles.accordionTitle, { color: colors.text }]}>Cooldown & Rollout</Text>
                   <Text style={[styles.accordionChevron, { color: colors.text + 'aa' }]}>{cooldownOpen ? '▲' : '▼'}</Text>
                 </TouchableOpacity>
                 {cooldownOpen && (
@@ -238,7 +236,6 @@ const styles = StyleSheet.create({
     gap: 8,
     flex: 1,
   },
-  emoji: { fontSize: 22, marginRight: 4 },
   notes: { marginTop: 8, lineHeight: 18 },
   treadmillBox: {
     marginTop: 8,
