@@ -30,9 +30,6 @@ export default function ProfileScreen() {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
   const [weeklyMiles, setWeeklyMiles] = useState('');
-  const [painLevel, setPainLevel] = useState(3);
-  const [wineDate, setWineDate] = useState('');
-  const [dopeyDate, setDopeyDate] = useState('');
   const [trainingDays, setTrainingDays] = useState(5);
   const [prefersTreadmill, setPrefersTreadmill] = useState(false);
   const [pace, setPace] = useState(13.0);
@@ -61,9 +58,6 @@ export default function ProfileScreen() {
       setProfile(p);
       setName(p.name);
       setWeeklyMiles(String(p.currentWeeklyMiles));
-      setPainLevel(p.hipPainLevel);
-      setWineDate(p.wineAndDineDate);
-      setDopeyDate(p.dopeyStartDate);
       setTrainingDays(p.trainingDaysPerWeek ?? 5);
       setPrefersTreadmill(p.prefersTreadmill ?? false);
       setPace(p.currentPaceMinPerMile ?? 13.0);
@@ -133,9 +127,6 @@ export default function ProfileScreen() {
       ...profile,
       name: name.trim() || profile.name,
       currentWeeklyMiles: parseFloat(weeklyMiles) || profile.currentWeeklyMiles,
-      hipPainLevel: painLevel,
-      wineAndDineDate: wineDate,
-      dopeyStartDate: dopeyDate,
       trainingDaysPerWeek: trainingDays,
       prefersTreadmill,
       currentPaceMinPerMile: pace,
@@ -212,45 +203,26 @@ export default function ProfileScreen() {
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Hip pain level</Text>
-          {editing ? (
-            <View style={styles.painMini}>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                <Button
-                  key={n}
-                  mode={painLevel === n ? 'contained' : 'outlined'}
-                  onPress={() => setPainLevel(n)}
-                  style={[styles.painMiniBtn, painLevel === n && { backgroundColor: '#1e40af' }]}
-                  labelStyle={[{ fontSize: 10, fontWeight: '700' }, painLevel === n && { color: '#fff' }]}
-                  contentStyle={{ paddingHorizontal: 0, minWidth: 0 }}
-                >
-                  {String(n)}
-                </Button>
-              ))}
-            </View>
-          ) : (
-            <Text style={styles.value}>{profile.hipPainLevel} / 10</Text>
-          )}
+          <Text style={styles.label}>Feeling level</Text>
+          <Text style={styles.value}>{profile.feelingLevel ?? '—'} / 10</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Wine & Dine date</Text>
-          {editing ? (
-            <TextInput value={wineDate} onChangeText={setWineDate} mode="outlined" dense style={styles.inlineInput} placeholder="yyyy-MM-dd" />
-          ) : (
-            <Text style={styles.value}>{profile.wineAndDineDate}</Text>
-          )}
+          <Text style={styles.label}>Goal type</Text>
+          <Text style={styles.value}>{(profile.goalType ?? 'general_training').replace(/_/g, ' ')}</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={styles.label}>Dopey Day 1 date</Text>
-          {editing ? (
-            <TextInput value={dopeyDate} onChangeText={setDopeyDate} mode="outlined" dense style={styles.inlineInput} placeholder="yyyy-MM-dd" />
-          ) : (
-            <Text style={styles.value}>{profile.dopeyStartDate}</Text>
-          )}
+          <Text style={styles.label}>Races</Text>
+          <Text style={styles.value}>{(profile.races ?? []).length} added</Text>
+        </View>
+        <Divider style={styles.rowDivider} />
+
+        <View style={styles.cardRow}>
+          <Text style={styles.label}>Injury</Text>
+          <Text style={styles.value}>{profile.injury ? profile.injury.type : 'None'}</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
@@ -440,12 +412,12 @@ export default function ProfileScreen() {
       <Surface style={styles.aboutCard} elevation={0}>
         <Text variant="titleSmall" style={styles.aboutTitle}>About Your Plan</Text>
         <Text style={styles.aboutText}>
-          • Phase 1–2: Build aerobic base safely with hip PT integration{'\n'}
-          • Phase 3: Race-specific prep for Wine & Dine (10K + Half){'\n'}
-          • Phase 4: Recovery after Wine & Dine weekend{'\n'}
-          • Phase 5: Dopey-specific back-to-back long runs + full marathon prep{'\n\n'}
-          Max weekly mileage increase: ~10% (conservative for gluteus minimus tear).
-          Cutback week every 4th week to allow adaptation.
+          • Phase 1–2: Build aerobic base and establish consistent weekly mileage{'\n'}
+          • Phase 3: Race-specific prep — tempo runs, long efforts, and terrain training{'\n'}
+          • Phase 4: Peak and taper leading into race week{'\n'}
+          • Phase 5: Post-race recovery and next-goal transition{'\n\n'}
+          Mileage increases ~10% per week with a cutback week every 4th week.
+          PT exercises are integrated throughout to keep you healthy.
         </Text>
       </Surface>
 
@@ -476,8 +448,6 @@ const styles = StyleSheet.create({
   value: { color: '#111827', fontWeight: '600', fontSize: 14 },
   rowDivider: { marginHorizontal: 14 },
   inlineInput: { flex: 1.5, backgroundColor: '#fff' },
-  painMini: { flexDirection: 'row', flexWrap: 'wrap', gap: 3, flex: 2, justifyContent: 'flex-end' },
-  painMiniBtn: { width: 30, minWidth: 0, height: 30, borderRadius: 6 },
   daysRow: { flexDirection: 'row', gap: 4 },
   dayBtn: { width: 40, minWidth: 0, height: 34, borderRadius: 6 },
   envRow: { flexDirection: 'row', gap: 6 },
