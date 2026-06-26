@@ -1,6 +1,10 @@
 export type WorkoutType =
   | 'easy_run'
   | 'long_run'
+  | 'interval_run'
+  | 'hill_run'
+  | 'tempo_run'
+  | 'fartlek'
   | 'cross_train'
   | 'pt_only'
   | 'rest'
@@ -13,7 +17,7 @@ export type CourseDifficulty = 'flat' | 'rolling' | 'hilly' | 'very_hilly';
 export interface Race {
   id: string;
   name: string;
-  date: string; // ISO date 'yyyy-MM-dd'
+  date: string; // ISO 'yyyy-MM-dd', optional for no_date_plan
   distanceMiles: number;
   terrain?: CourseDifficulty;
   elevationFt?: number;
@@ -23,9 +27,10 @@ export interface UserProfile {
   name: string;
   currentWeeklyMiles: number;
   feelingLevel: number; // 1–10
-  races: Race[];
   goalType: 'multi_race' | 'single_race' | 'no_date_plan' | 'general_training';
+  races: Race[];
   injury?: { type: string; description?: string };
+  planWeeks?: number; // for no_date_plan, e.g. 7, 10, 14, 18
   stravaAccessToken?: string;
   onboardingComplete: boolean;
   // Phase 2
@@ -67,6 +72,9 @@ export interface WorkoutLogEntry {
   // Phase 3
   actualPaceMinPerMile?: number;
   gelsConsumed?: number;
+  effortLevel?: number;   // 1-10 post-run effort
+  runFeeling?: number;    // 1-10 how run felt
+  postRunNotes?: string;
 }
 
 export type WorkoutLog = Record<string, WorkoutLogEntry>;
