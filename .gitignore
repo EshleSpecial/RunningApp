@@ -9,5 +9,4 @@ build/
 *.mobileprovision
 *.orig.*
 web-build/
-ios/
 android/
