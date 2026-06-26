@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import { Button, Chip, Divider, Surface, Text } from 'react-native-paper';
 import WorkoutCard from '../../components/WorkoutCard';
-import { loadTrainingPlan, loadWorkoutLog } from '../../lib/storage';
+import { loadTrainingPlan, loadWorkoutLog, loadUserProfile } from '../../lib/storage';
 import { exportPlanToCalendar } from '../../lib/calendar';
 import { useTheme } from '../../constants/theme';
-import type { TrainingWeek, WorkoutLog } from '../../types';
+import type { Race, TrainingWeek, UserProfile, WorkoutLog } from '../../types';
 
 const TODAY = format(new Date(), 'yyyy-MM-dd');
 
@@ -36,17 +36,26 @@ function groupByPhase(plan: TrainingWeek[]): Section[] {
   return Array.from(map.values());
 }
 
+function raceSubtitle(races: Race[]): string {
+  if (races.length === 0) return 'No races added yet';
+  if (races.length === 1) return races[0].name;
+  if (races.length === 2) return `${races[0].name} → ${races[1].name}`;
+  return `${races[0].name} + ${races.length - 1} more`;
+}
+
 export default function PlanScreen() {
   const { colors } = useTheme();
   const [plan, setPlan] = useState<TrainingWeek[]>([]);
   const [log, setLog] = useState<WorkoutLog>({});
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [calExporting, setCalExporting] = useState(false);
 
   const load = useCallback(async () => {
-    const [pl, wl] = await Promise.all([loadTrainingPlan(), loadWorkoutLog()]);
+    const [pl, wl, p] = await Promise.all([loadTrainingPlan(), loadWorkoutLog(), loadUserProfile()]);
     if (pl) setPlan(pl);
     setLog(wl);
+    if (p) setProfile(p);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -94,7 +103,9 @@ export default function PlanScreen() {
       ListHeaderComponent={
         <View style={styles.listHeader}>
           <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Training Plan</Text>
-          <Text variant="bodySmall" style={[styles.subtitle, { color: colors.text }]}>30 weeks · Wine & Dine → Dopey Challenge</Text>
+          <Text variant="bodySmall" style={[styles.subtitle, { color: colors.text }]}>
+            {plan.length} week{plan.length !== 1 ? 's' : ''} · {raceSubtitle(profile?.races ?? [])}
+          </Text>
           <Button
             mode="outlined"
             icon="calendar-export"

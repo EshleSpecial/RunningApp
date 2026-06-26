@@ -34,7 +34,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="pt"
         options={{
-          title: 'Hip PT',
+          title: 'Recovery',
           tabBarIcon: ({ color, size }) => <TabIcon name="arm-flex" color={color} size={size} />,
         }}
       />
