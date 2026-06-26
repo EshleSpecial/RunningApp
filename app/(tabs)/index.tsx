@@ -1,8 +1,7 @@
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import Slider from '@react-native-community/slider';
-import { Chip, Divider, ProgressBar, Surface, Text } from 'react-native-paper';
+import { Button, Chip, Divider, ProgressBar, Surface, Text } from 'react-native-paper';
 import WorkoutCard from '../../components/WorkoutCard';
 import {
   loadPTLog,
@@ -234,24 +233,23 @@ export default function Dashboard() {
       {/* Feeling check-in */}
       <Surface style={s.card} elevation={1}>
         <Text variant="titleSmall" style={s.cardTitle}>How are you feeling today?</Text>
-        <Slider
-          minimumValue={0}
-          maximumValue={10}
-          step={1}
-          value={feelingLevel}
-          onValueChange={setFeelingLevel}
-          minimumTrackTintColor={feelingColor(feelingLevel, theme)}
-          maximumTrackTintColor={theme.colors.background}
-          thumbTintColor={feelingColor(feelingLevel, theme)}
-          style={s.slider}
-        />
-        <View style={s.sliderLabels}>
-          <Text style={s.sliderEndLabel}>0</Text>
-          <Text style={[s.feelingNote, { color: feelingColor(feelingLevel, theme) }]}>
-            {feelingNote(feelingLevel)}
-          </Text>
-          <Text style={s.sliderEndLabel}>10</Text>
+        <View style={s.feelingGrid}>
+          {[1,2,3,4,5,6,7,8,9,10].map(n => (
+            <Button
+              key={n}
+              mode={feelingLevel === n ? 'contained' : 'outlined'}
+              onPress={() => setFeelingLevel(n)}
+              style={[s.feelingBtn, feelingLevel === n && { backgroundColor: feelingColor(n, theme) }]}
+              labelStyle={[s.feelingBtnLabel, feelingLevel === n && { color: '#fff' }]}
+              contentStyle={{ paddingHorizontal: 0, minWidth: 0 }}
+            >
+              {String(n)}
+            </Button>
+          ))}
         </View>
+        <Text style={[s.feelingNote, { color: feelingColor(feelingLevel, theme) }]}>
+          {feelingNote(feelingLevel)}
+        </Text>
         {showSwap && (
           <Text style={s.swapHint}>
             Feeling rough — consider swapping today's run for cross-training below.
@@ -317,10 +315,10 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     cardTitle: { fontWeight: '700', color: theme.colors.text },
     milesText: { color: theme.colors.text, opacity: 0.6 },
     progressBar: { height: 8, borderRadius: 4 },
-    slider: { marginVertical: theme.spacing.sm },
-    sliderLabels: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    sliderEndLabel: { fontSize: theme.typography.xs, color: theme.colors.text, opacity: 0.5, width: 16, textAlign: 'center' },
-    feelingNote: { fontSize: theme.typography.sm, fontWeight: '600', flex: 1, textAlign: 'center' },
+    feelingGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginVertical: theme.spacing.sm },
+    feelingBtn: { width: 44, minWidth: 0 },
+    feelingBtnLabel: { fontSize: 13, fontWeight: '700' },
+    feelingNote: { fontSize: theme.typography.sm, fontWeight: '600', textAlign: 'center', marginTop: 4 },
     swapHint: {
       color: theme.colors.warning,
       backgroundColor: theme.colors.surface,
