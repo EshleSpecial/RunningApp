@@ -35,8 +35,5 @@
     "experiments": {
       "typedRoutes": true
     },
-    "extra": {
-      "newArchEnabled": false
-    }
   }
 }

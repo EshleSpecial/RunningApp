@@ -12,7 +12,7 @@ def ccache_enabled?(podfile_properties)
   podfile_properties['apple.ccacheEnabled'] == 'true'
 end
 
-ENV['RCT_NEW_ARCH_ENABLED'] = '0'
+ENV['RCT_NEW_ARCH_ENABLED'] ||= '0' if podfile_properties['newArchEnabled'] == 'false'
 ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] ||= podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR']
 ENV['RCT_USE_RN_DEP'] ||= '1' if podfile_properties['ios.buildReactNativeFromSource'] != 'true' && podfile_properties['newArchEnabled'] != 'false'
 ENV['RCT_USE_PREBUILT_RNCORE'] ||= '1' if podfile_properties['ios.buildReactNativeFromSource'] != 'true' && podfile_properties['newArchEnabled'] != 'false'
@@ -61,9 +61,21 @@ target 'RunDisneyTraining' do
     )
     # Patch fmt headers to disable consteval (incompatible with this Clang version)
     Dir.glob("#{installer.sandbox.root}/fmt/include/fmt/*.h").each do |header|
+      next unless File.writable?(header)
       content = File.read(header)
       patched = content.gsub(/^(#\s*define\s+FMT_USE_CONSTEVAL)\s+1/, '\1 0')
       File.write(header, patched) if patched != content
+    end
+
+    # Patch react-native-screens to remove reference to removed parentShadowView field
+    rnscreens_file = "#{installer.sandbox.root}/RNScreens/RNSScreenRemovalListener.cpp"
+    if File.exist?(rnscreens_file)
+      content = File.read(rnscreens_file)
+      patched = content.gsub(
+        /strcmp\(mutation\.parentShadowView\.componentName,\s*"RNSScreenStack"\)\s*==\s*0/,
+        'true'
+      )
+      File.write(rnscreens_file, patched) if patched != content
     end
   end
 end
