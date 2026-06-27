@@ -1,23 +1,24 @@
 {
   "expo": {
-    "name": "RunDisney Training",
-    "slug": "rundisney-training",
+    "name": "I Can Do Hard Things",
+    "slug": "icdht",
     "version": "1.0.0",
-    "scheme": "rundisney-training",
+    "scheme": "icdht",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "backgroundColor": "#1e40af"
+      "backgroundColor": "#1a2f5a"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rundisney.training",
-      "deploymentTarget": "15.1"
+      "bundleIdentifier": "com.icdht.app",
+      "deploymentTarget": "15.1",
+      "userInterfaceStyle": "automatic"
     },
     "android": {
-      "package": "com.rundisney.training",
+      "package": "com.icdht.app",
       "adaptiveIcon": {
-        "backgroundColor": "#1e40af"
+        "backgroundColor": "#1a2f5a"
       }
     },
     "web": {
@@ -34,6 +35,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
+    }
   }
 }
