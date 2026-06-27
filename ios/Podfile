@@ -67,13 +67,16 @@ target 'RunDisneyTraining' do
       File.write(header, patched) if patched != content
     end
 
-    # Patch folly Expected.h: remove coroutine #include that references a missing header
-    Dir.glob("#{installer.sandbox.root}/**/folly/Expected.h").each do |folly_expected|
-      next unless File.exist?(folly_expected)
+    # Patch folly Expected.h: remove coroutine #include that references a missing header.
+    # Dir.glob does not follow symlinks, so collect paths via find(1) which does.
+    folly_candidates = `find "#{installer.sandbox.root}" -name "Expected.h" -path "*/folly/*" 2>/dev/null`.split("\n")
+    folly_candidates.each do |path|
+      real = File.exist?(path) ? File.realpath(path) : nil
+      next unless real
       begin
-        content = File.read(folly_expected)
+        content = File.read(real)
         patched = content.gsub(/#include\s*<folly\/coro\/Coroutine\.h>/, '// coroutine include removed by Podfile patch')
-        File.write(folly_expected, patched) if patched != content
+        File.write(real, patched) if patched != content
       rescue Errno::EACCES
         next
       end
