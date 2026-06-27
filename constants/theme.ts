@@ -1,4 +1,4 @@
-import { useColorScheme } from 'react-native';
+import { useColorScheme, Appearance } from 'react-native';
 
 export const Colors = {
   primary: '#1a2f5a',
@@ -58,6 +58,8 @@ interface ThemeTokens {
 
 export function useTheme(): ThemeTokens {
   const scheme = useColorScheme();
+  console.log('useColorScheme returned:', scheme);
+  console.log('Appearance.getColorScheme():', Appearance.getColorScheme());
   const dark = scheme === 'dark';
 
   return {
