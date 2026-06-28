@@ -163,12 +163,38 @@ target 'RunDisneyTraining' do
       end
     end
 
-    # Patch LayoutAnimationsUtils.cpp: parentShadowView was removed from ShadowViewMutation
-    lau = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/reanimated/LayoutAnimations/LayoutAnimationsUtils.cpp')
-    if File.exist?(lau)
-      content = File.read(lau)
-      patched = content.gsub('mutation.parentShadowView.tag', 'tag')
-      File.write(lau, patched) if patched != content
+    # Patch reanimated LayoutAnimations: parentShadowView removed from ShadowViewMutation
+    reanimated_la_dir = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/reanimated/LayoutAnimations')
+    helper_fn = <<~CPP
+
+      static inline facebook::react::ShadowView reanimated_parentShadowViewStub(facebook::react::Tag tag) {
+        facebook::react::ShadowView sv{};
+        sv.tag = tag;
+        return sv;
+      }
+    CPP
+    [
+      File.join(reanimated_la_dir, 'LayoutAnimationsUtils.cpp'),
+      File.join(reanimated_la_dir, 'LayoutAnimationsProxy.cpp'),
+    ].each do |f|
+      next unless File.exist?(f)
+      content = File.read(f)
+      patched = content
+        .gsub('mutation.parentShadowView.layoutMetrics.frame.size.width', '0')
+        .gsub('mutation.parentShadowView.layoutMetrics.frame.size.height', '0')
+        .gsub('mutation.parentShadowView.tag', 'mutation.parentTag')
+        .gsub(/\b(InsertMutation|RemoveMutation)\(mutation\.parentShadowView,/, '\1(mutation.parentTag,')
+        .gsub('mutation.newChildShadowView, *newView, mutation.parentShadowView)', 'mutation.newChildShadowView, *newView, mutation.parentTag)')
+        .gsub('std::make_shared<ShadowView>(mutation.parentShadowView)',
+              'std::make_shared<ShadowView>(reanimated_parentShadowViewStub(mutation.parentTag))')
+      if patched != content
+        last_include = patched.rindex(/#include\s+[<"]/)
+        if last_include
+          eol = patched.index("\n", last_include)
+          patched = patched[0..eol] + helper_fn + patched[(eol+1)..]
+        end
+        File.write(f, patched)
+      end
     end
 
     # Patch WorkletRuntimeDecorator.cpp: rename parseArgs → AsyncQueue (corrupted install)
