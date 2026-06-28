@@ -173,6 +173,7 @@ target 'RunDisneyTraining' do
         next unless content
         patched = content
           .gsub('double mountTime)', 'HighResTimeStamp mountTime)')
+          .gsub('double) noexcept', 'HighResTimeStamp) noexcept')
         File.write(f, patched) if patched != content
       end
     end
@@ -185,6 +186,7 @@ target 'RunDisneyTraining' do
       patched = content
         .gsub('UIManagerMountHookf', 'UIManagerMountHook')
         .gsub('double mountTime)', 'HighResTimeStamp mountTime)')
+        .gsub('double) noexcept', 'HighResTimeStamp) noexcept')
       File.write(f, patched) if patched != content
     end
 
