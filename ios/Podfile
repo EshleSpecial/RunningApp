@@ -67,16 +67,19 @@ target 'RunDisneyTraining' do
       File.write(header, patched) if patched != content
     end
 
-    # Create stub folly/coro/Coroutine.h at every location where folly headers
-    # are visible to the compiler (including symlinked header dirs).
-    `find #{installer.sandbox.root} -name 'Expected.h' -path '*/folly/*' 2>/dev/null`.split("\n").each do |path|
-      # Use the original path (not realpath) so symlinked header dirs get the stub too.
-      folly_dir = File.dirname(path)
-      coro_dir  = File.join(folly_dir, 'coro')
-      stub      = File.join(coro_dir, 'Coroutine.h')
-      unless File.exist?(stub)
-        FileUtils.mkdir_p(coro_dir) rescue nil
-        File.write(stub, "#pragma once\n// stub: folly coroutines not available\n") rescue nil
+    # Patch folly headers that conditionally include folly/coro/Coroutine.h —
+    # disable the FOLLY_HAS_COROUTINES block directly in the source.
+    %w[Expected.h Optional.h].each do |fname|
+      `find #{installer.sandbox.root} -name '#{fname}' -path '*/folly/*' 2>/dev/null`.split("\n").each do |path|
+        real = File.symlink?(path) ? File.realpath(path) : path
+        [path, real].uniq.each do |f|
+          next unless File.exist?(f)
+          File.chmod(0644, f) rescue nil
+          content = File.read(f) rescue nil
+          next unless content
+          patched = content.gsub(/#if\s+FOLLY_HAS_COROUTINES/, '#if 0 // patched: FOLLY_HAS_COROUTINES')
+          File.write(f, patched) if patched != content
+        end
       end
     end
 
