@@ -214,6 +214,8 @@ target 'RunDisneyTraining' do
         .gsub('mutation.newChildShadowView, *newView, mutation.parentShadowView)', 'mutation.newChildShadowView, *newView, mutation.parentTag)')
         .gsub('std::make_shared<ShadowView>(mutation.parentShadowView)',
               'std::make_shared<ShadowView>(reanimated_parentShadowViewStub(mutation.parentTag))')
+        .gsub('mutation.parentShadowView',
+              'reanimated_parentShadowViewStub(mutation.parentTag)')
       if patched != content
         last_include = patched.rindex(/#include\s+[<"]/)
         if last_include
