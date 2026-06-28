@@ -163,6 +163,14 @@ target 'RunDisneyTraining' do
       end
     end
 
+    # Patch WorkletRuntimeDecorator.cpp: rename parseArgs → AsyncQueue (corrupted install)
+    wrd = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/worklets/WorkletRuntime/WorkletRuntimeDecorator.cpp')
+    if File.exist?(wrd)
+      content = File.read(wrd)
+      patched = content.gsub('parseArgs(', 'AsyncQueue(')
+      File.write(wrd, patched) if patched != content
+    end
+
     # Patch react-native-screens to remove reference to removed parentShadowView field
     rnscreens_file = "#{installer.sandbox.root}/RNScreens/RNSScreenRemovalListener.cpp"
     if File.exist?(rnscreens_file)
