@@ -71,7 +71,7 @@ target 'RunDisneyTraining' do
     # disable the FOLLY_HAS_COROUTINES block directly in the source.
     %w[Expected.h Optional.h].each do |fname|
       `find #{installer.sandbox.root} -name '#{fname}' -path '*/folly/*' 2>/dev/null`.split("\n").each do |path|
-        real = File.symlink?(path) ? File.realpath(path) : path
+        real = File.symlink?(path) ? (File.realpath(path) rescue path) : path
         [path, real].uniq.each do |f|
           next unless File.exist?(f)
           File.chmod(0644, f) rescue nil
