@@ -128,9 +128,18 @@ target 'RunDisneyTraining' do
     installer.pods_project.targets.each do |target|
       next unless target.name == 'RNReanimated'
       target.build_configurations.each do |config|
-        flags = config.build_settings['OTHER_CPLUSPLUSFLAGS'] || '$(inherited)'
-        unless flags.to_s.include?('-Wno-overloaded-virtual')
-          config.build_settings['OTHER_CPLUSPLUSFLAGS'] = "#{flags} -Wno-overloaded-virtual"
+        flags = config.build_settings['OTHER_CPLUSPLUSFLAGS']
+        case flags
+        when nil, ''
+          config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-overloaded-virtual'
+        when String
+          unless flags.include?('-Wno-overloaded-virtual')
+            config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ' -Wno-overloaded-virtual'
+          end
+        when Array
+          unless flags.include?('-Wno-overloaded-virtual')
+            config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ['-Wno-overloaded-virtual']
+          end
         end
       end
     end
