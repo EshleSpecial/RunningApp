@@ -163,6 +163,14 @@ target 'RunDisneyTraining' do
       end
     end
 
+    # Patch LayoutAnimationsUtils.cpp: parentShadowView was removed from ShadowViewMutation
+    lau = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/reanimated/LayoutAnimations/LayoutAnimationsUtils.cpp')
+    if File.exist?(lau)
+      content = File.read(lau)
+      patched = content.gsub('mutation.parentShadowView.tag', 'tag')
+      File.write(lau, patched) if patched != content
+    end
+
     # Patch WorkletRuntimeDecorator.cpp: rename parseArgs → AsyncQueue (corrupted install)
     wrd = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/worklets/WorkletRuntime/WorkletRuntimeDecorator.cpp')
     if File.exist?(wrd)
