@@ -1,4 +1,5 @@
-import { useColorScheme, Appearance } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Appearance } from 'react-native';
 
 export const Colors = {
   primary: '#1a2f5a',
@@ -57,9 +58,15 @@ interface ThemeTokens {
 }
 
 export function useTheme(): ThemeTokens {
-  const scheme = useColorScheme();
-  console.log('useColorScheme returned:', scheme);
-  console.log('Appearance.getColorScheme():', Appearance.getColorScheme());
+  const [scheme, setScheme] = useState(Appearance.getColorScheme());
+
+  useEffect(() => {
+    const sub = Appearance.addChangeListener(({ colorScheme }) => {
+      setScheme(colorScheme);
+    });
+    return () => sub.remove();
+  }, []);
+
   const dark = scheme === 'dark';
 
   return {

@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Appearance } from 'react-native';
 import { PaperProvider, MD3LightTheme, MD3DarkTheme, configureFonts } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -46,7 +47,11 @@ const darkTheme = {
 };
 
 export default function RootLayout() {
-  const scheme = useColorScheme();
+  const [scheme, setScheme] = useState(Appearance.getColorScheme());
+  useEffect(() => {
+    const sub = Appearance.addChangeListener(({ colorScheme }) => setScheme(colorScheme));
+    return () => sub.remove();
+  }, []);
   const theme = scheme === 'dark' ? darkTheme : lightTheme;
 
   return (
