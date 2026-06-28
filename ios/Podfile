@@ -71,12 +71,41 @@ target 'RunDisneyTraining' do
     # block is never entered and the missing folly/coro/Coroutine.h is never included.
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
-        flags = config.build_settings['OTHER_CPLUSPLUSFLAGS'] || '$(inherited)'
-        flags = [flags] if flags.is_a?(String)
-        unless flags.include?('-DFOLLY_HAS_COROUTINES=0')
-          config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ['-DFOLLY_HAS_COROUTINES=0']
+        flags = config.build_settings['OTHER_CPLUSPLUSFLAGS']
+        case flags
+        when nil, ''
+          config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -DFOLLY_HAS_COROUTINES=0'
+        when String
+          unless flags.include?('-DFOLLY_HAS_COROUTINES=0')
+            config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ' -DFOLLY_HAS_COROUTINES=0'
+          end
+        when Array
+          unless flags.include?('-DFOLLY_HAS_COROUTINES=0')
+            config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ['-DFOLLY_HAS_COROUTINES=0']
+          end
         end
       end
+    end
+    # Also write the flag into the main project xcconfig as a fallback
+    installer.generated_projects.each do |project|
+      project.targets.each do |target|
+        target.build_configurations.each do |config|
+          flags = config.build_settings['OTHER_CPLUSPLUSFLAGS']
+          case flags
+          when nil, ''
+            config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -DFOLLY_HAS_COROUTINES=0'
+          when String
+            unless flags.include?('-DFOLLY_HAS_COROUTINES=0')
+              config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ' -DFOLLY_HAS_COROUTINES=0'
+            end
+          when Array
+            unless flags.include?('-DFOLLY_HAS_COROUTINES=0')
+              config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + ['-DFOLLY_HAS_COROUTINES=0']
+            end
+          end
+        end
+      end
+      project.save
     end
 
     # Patch react-native-screens to remove reference to removed parentShadowView field
