@@ -71,7 +71,8 @@ target 'RunDisneyTraining' do
     # so the missing folly/coro/Coroutine.h is never included.
     `find #{installer.sandbox.root} -name 'Expected.h' -path '*/folly/*' 2>/dev/null`.split("\n").each do |path|
       real = File.symlink?(path) ? File.realpath(path) : path
-      next unless File.exist?(real) && File.writable?(real)
+      next unless File.exist?(real)
+      File.chmod(0644, real) rescue nil
       content = File.read(real)
       patched = content.gsub(/#if\s+FOLLY_HAS_COROUTINES/, '#if 0 // patched: FOLLY_HAS_COROUTINES')
       File.write(real, patched) if patched != content
