@@ -217,7 +217,7 @@ target 'RunDisneyTraining' do
         .gsub('mutation.parentShadowView',
               'reanimated_parentShadowViewStub(mutation.parentTag)')
       if patched != content
-        unless patched.include?('reanimated_parentShadowViewStub')
+        unless patched.include?('reanimated_parentShadowViewStub(facebook::react::Tag')
           last_include = patched.rindex(/#include\s+[<"]/)
           if last_include
             eol = patched.index("\n", last_include)
