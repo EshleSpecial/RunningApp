@@ -67,17 +67,16 @@ target 'RunDisneyTraining' do
       File.write(header, patched) if patched != content
     end
 
-    # Create stub folly/coro/Coroutine.h wherever folly headers live so the
-    # #include inside Expected.h and Optional.h always resolves.
+    # Create stub folly/coro/Coroutine.h at every location where folly headers
+    # are visible to the compiler (including symlinked header dirs).
     `find #{installer.sandbox.root} -name 'Expected.h' -path '*/folly/*' 2>/dev/null`.split("\n").each do |path|
-      real = File.symlink?(path) ? File.realpath(path) : path
-      next unless File.exist?(real)
-      folly_dir = File.dirname(real)          # …/folly
+      # Use the original path (not realpath) so symlinked header dirs get the stub too.
+      folly_dir = File.dirname(path)
       coro_dir  = File.join(folly_dir, 'coro')
       stub      = File.join(coro_dir, 'Coroutine.h')
       unless File.exist?(stub)
-        FileUtils.mkdir_p(coro_dir)
-        File.write(stub, "// stub: folly coroutines not available\n#pragma once\n")
+        FileUtils.mkdir_p(coro_dir) rescue nil
+        File.write(stub, "#pragma once\n// stub: folly coroutines not available\n") rescue nil
       end
     end
 
