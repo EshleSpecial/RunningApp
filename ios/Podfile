@@ -157,10 +157,35 @@ target 'RunDisneyTraining' do
         next unless content
         patched = content
           .gsub('UIManagerMountHookf', 'UIManagerMountHook')
-          .gsub(/(\w+)\s+override\s*;/, '\1;')
-          .gsub(/(\w+)\s+override\s*\{/, '\1 {')
+          .gsub('double mountTime) noexcept override', 'HighResTimeStamp mountTime) noexcept override')
+          .gsub('double mountTime) noexcept', 'HighResTimeStamp mountTime) noexcept')
         File.write(f, patched) if patched != content
       end
+    end
+
+    # Also patch ReanimatedMountHook.cpp for the same signature change
+    `find #{installer.sandbox.root} -name 'ReanimatedMountHook.cpp' 2>/dev/null`.split("\n").each do |path|
+      real = File.symlink?(path) ? (File.realpath(path) rescue path) : path
+      [path, real].uniq.each do |f|
+        next unless File.exist?(f)
+        File.chmod(0644, f) rescue nil
+        content = File.read(f) rescue nil
+        next unless content
+        patched = content
+          .gsub('double mountTime)', 'HighResTimeStamp mountTime)')
+        File.write(f, patched) if patched != content
+      end
+    end
+    # Also patch the source in node_modules
+    rnh_src = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.h')
+    rnh_cpp = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.cpp')
+    [rnh_src, rnh_cpp].each do |f|
+      next unless File.exist?(f)
+      content = File.read(f)
+      patched = content
+        .gsub('UIManagerMountHookf', 'UIManagerMountHook')
+        .gsub('double mountTime)', 'HighResTimeStamp mountTime)')
+      File.write(f, patched) if patched != content
     end
 
     # Patch reanimated LayoutAnimations: parentShadowView removed from ShadowViewMutation
@@ -194,6 +219,31 @@ target 'RunDisneyTraining' do
           patched = patched[0..eol] + helper_fn + patched[(eol+1)..]
         end
         File.write(f, patched)
+      end
+    end
+
+    # Patch NativeReanimatedModule.cpp: add shadowNodeFromValue shim (renamed in RN 0.81)
+    nrm = File.join(File.dirname(installer.sandbox.root), '../node_modules/react-native-reanimated/Common/cpp/reanimated/NativeModules/NativeReanimatedModule.cpp')
+    if File.exist?(nrm)
+      content = File.read(nrm)
+      shim = <<~CPP
+
+        // RN 0.81 compat: shadowNodeFromValue was replaced by shadowNodeListFromValue
+        static inline facebook::react::ShadowNode::Shared shadowNodeFromValue(
+            jsi::Runtime &rt, const jsi::Value &value) {
+          auto list = facebook::react::shadowNodeListFromValue(rt, value);
+          if (list && !list->empty()) return list->at(0);
+          return nullptr;
+        }
+      CPP
+      unless content.include?('shadowNodeFromValue was replaced')
+        insert_after = '#ifdef RCT_NEW_ARCH_ENABLED'
+        idx = content.index(insert_after)
+        if idx
+          eol = content.index("\n", idx)
+          content = content[0..eol] + shim + content[(eol+1)..]
+          File.write(nrm, content)
+        end
       end
     end
 
