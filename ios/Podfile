@@ -124,6 +124,17 @@ target 'RunDisneyTraining' do
       project.save
     end
 
+    # Suppress -Woverloaded-virtual in RNReanimated (non-virtual override hides virtual)
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'RNReanimated'
+      target.build_configurations.each do |config|
+        flags = config.build_settings['OTHER_CPLUSPLUSFLAGS'] || '$(inherited)'
+        unless flags.to_s.include?('-Wno-overloaded-virtual')
+          config.build_settings['OTHER_CPLUSPLUSFLAGS'] = "#{flags} -Wno-overloaded-virtual"
+        end
+      end
+    end
+
     # Patch react-native-screens to remove reference to removed parentShadowView field
     rnscreens_file = "#{installer.sandbox.root}/RNScreens/RNSScreenRemovalListener.cpp"
     if File.exist?(rnscreens_file)
