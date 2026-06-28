@@ -67,6 +67,21 @@ target 'RunDisneyTraining' do
       File.write(header, patched) if patched != content
     end
 
+    # Patch folly Expected.h to remove FOLLY_HAS_COROUTINES guard so the missing
+    # folly/coro/Coroutine.h is never included regardless of compiler flags.
+    expected_h_candidates = [
+      "#{installer.sandbox.root}/RCT-Folly/folly/Expected.h",
+      "#{installer.sandbox.root}/Headers/Public/RCT-Folly/folly/Expected.h",
+      "#{installer.sandbox.root}/Headers/Private/RCT-Folly/folly/Expected.h",
+    ]
+    expected_h_candidates.each do |path|
+      real = File.exist?(path) ? (File.symlink?(path) ? File.realpath(path) : path) : nil
+      next unless real && File.writable?(real)
+      content = File.read(real)
+      patched = content.gsub(/#if\s+FOLLY_HAS_COROUTINES/, '#if 0 // patched: FOLLY_HAS_COROUTINES')
+      File.write(real, patched) if patched != content
+    end
+
     # Disable folly coroutines via compiler flag so Expected.h's #if FOLLY_HAS_COROUTINES
     # block is never entered and the missing folly/coro/Coroutine.h is never included.
     installer.pods_project.targets.each do |target|
