@@ -217,10 +217,12 @@ target 'RunDisneyTraining' do
         .gsub('mutation.parentShadowView',
               'reanimated_parentShadowViewStub(mutation.parentTag)')
       if patched != content
-        last_include = patched.rindex(/#include\s+[<"]/)
-        if last_include
-          eol = patched.index("\n", last_include)
-          patched = patched[0..eol] + helper_fn + patched[(eol+1)..]
+        unless patched.include?('reanimated_parentShadowViewStub')
+          last_include = patched.rindex(/#include\s+[<"]/)
+          if last_include
+            eol = patched.index("\n", last_include)
+            patched = patched[0..eol] + helper_fn + patched[(eol+1)..]
+          end
         end
         File.write(f, patched)
       end
