@@ -144,6 +144,25 @@ target 'RunDisneyTraining' do
       end
     end
 
+    # Patch ReanimatedMountHook.h: fix 'UIManagerMountHookf' typo and non-virtual override
+    reanimated_hook_candidates = [
+      "#{installer.sandbox.root}/Headers/Private/RNReanimated/reanimated/Fabric/ReanimatedMountHook.h",
+    ] + `find #{installer.sandbox.root} -name 'ReanimatedMountHook.h' 2>/dev/null`.split("\n")
+    reanimated_hook_candidates.uniq.each do |path|
+      real = File.symlink?(path) ? (File.realpath(path) rescue path) : path
+      [path, real].uniq.each do |f|
+        next unless File.exist?(f)
+        File.chmod(0644, f) rescue nil
+        content = File.read(f) rescue nil
+        next unless content
+        patched = content
+          .gsub('UIManagerMountHookf', 'UIManagerMountHook')
+          .gsub(/(\w+)\s+override\s*;/, '\1;')
+          .gsub(/(\w+)\s+override\s*\{/, '\1 {')
+        File.write(f, patched) if patched != content
+      end
+    end
+
     # Patch react-native-screens to remove reference to removed parentShadowView field
     rnscreens_file = "#{installer.sandbox.root}/RNScreens/RNSScreenRemovalListener.cpp"
     if File.exist?(rnscreens_file)
