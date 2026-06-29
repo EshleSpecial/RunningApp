@@ -90,7 +90,7 @@ export default function PlanScreen() {
       keyExtractor={(item: TrainingWeek) => item.startDate}
       stickySectionHeadersEnabled
       renderSectionHeader={({ section }: { section: { phase: number; phaseName: string; data: TrainingWeek[] } }) => (
-        <View style={[styles.sectionHeader, { backgroundColor: PHASE_COLORS[section.phase] + '22' }]}>
+        <View style={[styles.sectionHeader, { backgroundColor: '#0a1220' }]}>
           <View style={[styles.phaseBar, { backgroundColor: PHASE_COLORS[section.phase] }]} />
           <Text style={[styles.phaseName, { color: PHASE_COLORS[section.phase] }]}>
             {section.phaseName}

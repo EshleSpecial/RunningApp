@@ -57,7 +57,7 @@ export default function ProgressScreen() {
       <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Progress</Text>
 
       {/* Streak */}
-      <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
+      <Surface style={[styles.card, { backgroundColor: '#1e3060' }]} elevation={1}>
         <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Current Streak</Text>
         <View style={styles.streakRow}>
           <Text style={[styles.streakNum, { color: colors.accent }]}>{streak}</Text>
@@ -77,7 +77,7 @@ export default function ProgressScreen() {
       </Surface>
 
       {/* Milestone badges */}
-      <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
+      <Surface style={[styles.card, { backgroundColor: '#1e3060' }]} elevation={1}>
         <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Milestone Badges</Text>
         <View style={styles.badgeGrid}>
           {MILESTONE_BADGES.map(badge => {
@@ -105,7 +105,7 @@ export default function ProgressScreen() {
       <Divider style={styles.divider} />
 
       {/* Race predictions */}
-      <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
+      <Surface style={[styles.card, { backgroundColor: '#1e3060' }]} elevation={1}>
         <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Race Time Predictions</Text>
         <Text style={[styles.predictionNote, { color: colors.textSecondary }]}>
           {basedOnActual
@@ -127,7 +127,7 @@ export default function ProgressScreen() {
 
       {/* Pace history */}
       {paceHistory.length > 0 && (
-        <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
+        <Surface style={[styles.card, { backgroundColor: '#1e3060' }]} elevation={1}>
           <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Recent Run Paces</Text>
           {paceHistory.map((entry, i) => (
             <View key={i} style={[styles.paceRow, { borderBottomColor: colors.border }]}>

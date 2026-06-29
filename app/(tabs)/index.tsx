@@ -40,11 +40,8 @@ function getTodayWorkout(week: TrainingWeek): Workout | undefined {
   return week.workouts.find(w => w.date === TODAY);
 }
 
-function feelingColor(n: number, theme: ReturnType<typeof useTheme>): string {
-  if (n <= 3) return theme.colors.success;
-  if (n <= 5) return theme.colors.warning;
-  if (n <= 7) return theme.colors.accent;
-  return theme.colors.danger;
+function feelingColor(_n: number, theme: ReturnType<typeof useTheme>): string {
+  return theme.colors.accent;
 }
 
 function feelingNote(n: number): string {
@@ -303,14 +300,6 @@ export default function Dashboard() {
         </Surface>
       )}
 
-      {/* PT nudge */}
-      {todayPTDone < 3 && (
-        <Surface style={s.ptNudge} elevation={1}>
-          <Text style={s.ptNudgeText}>
-            Don't forget your PT exercises today! ({todayPTDone} done)
-          </Text>
-        </Surface>
-      )}
     </ScrollView>
   );
 }
@@ -359,7 +348,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     progressBar: { height: 8, borderRadius: 4 },
     feelingGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginVertical: theme.spacing.sm },
     feelingBtn: { width: 44, minWidth: 0 },
-    feelingBtnLabel: { fontSize: 13, fontWeight: '700' },
+    feelingBtnLabel: { fontSize: 13, fontWeight: '700', color: theme.colors.textPrimary },
     feelingNote: { fontSize: theme.typography.sm, fontWeight: '600', textAlign: 'center', marginTop: 4 },
     swapHint: {
       color: theme.colors.warning,

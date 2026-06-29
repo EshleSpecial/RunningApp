@@ -172,7 +172,7 @@ export default function ProfileScreen() {
     <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Profile</Text>
-        <Text variant="bodySmall" style={[styles.subtitle, { color: colors.textSecondary }]}>{profile.name}'s Training Journey</Text>
+        <Text variant="bodySmall" style={[styles.subtitle, { color: colors.accent }]}>{profile.name}'s Training Journey</Text>
       </View>
 
       <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>

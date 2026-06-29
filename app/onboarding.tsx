@@ -174,8 +174,8 @@ export default function Onboarding() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text variant="headlineMedium" style={[styles.title, { color: colors.primary }]}>Race Training</Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: colors.textPrimary }]}>Let's build your plan</Text>
+          <Text variant="headlineMedium" style={[styles.title, { color: '#e8e4dd' }]}>I Can Do Hard Things</Text>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: '#e8e4dd' }]}>Your training journey starts here</Text>
           <ProgressBar
             progress={displayProgress}
             color={colors.accent}
@@ -292,7 +292,7 @@ export default function Onboarding() {
                   mode={!prefersTreadmill ? 'contained' : 'outlined'}
                   onPress={() => setPrefersTreadmill(false)}
                   style={[styles.envBtn, !prefersTreadmill && { backgroundColor: colors.success }]}
-                  labelStyle={!prefersTreadmill ? { color: '#fff' } : undefined}
+                  labelStyle={!prefersTreadmill ? { color: '#fff' } : { color: '#e8e4dd' }}
                   icon="weather-sunny"
                 >
                   Outdoors
@@ -301,7 +301,7 @@ export default function Onboarding() {
                   mode={prefersTreadmill ? 'contained' : 'outlined'}
                   onPress={() => setPrefersTreadmill(true)}
                   style={[styles.envBtn, prefersTreadmill && { backgroundColor: colors.primary }]}
-                  labelStyle={prefersTreadmill ? { color: '#fff' } : undefined}
+                  labelStyle={prefersTreadmill ? { color: '#fff' } : { color: '#e8e4dd' }}
                   icon="run-fast"
                 >
                   Treadmill
@@ -505,18 +505,18 @@ export default function Onboarding() {
                 <Button
                   mode={hasInjury ? 'contained' : 'outlined'}
                   onPress={() => setHasInjury(true)}
-                  style={[styles.envBtn, hasInjury && { backgroundColor: colors.danger }]}
-                  labelStyle={hasInjury ? { color: '#fff' } : undefined}
+                  style={[styles.envBtn, { backgroundColor: hasInjury ? colors.accent : colors.surface }]}
+                  labelStyle={{ color: colors.textPrimary }}
                 >
-                  Yes, I have an injury
+                  Yes
                 </Button>
                 <Button
                   mode={!hasInjury ? 'contained' : 'outlined'}
                   onPress={() => setHasInjury(false)}
-                  style={[styles.envBtn, !hasInjury && { backgroundColor: colors.success }]}
-                  labelStyle={!hasInjury ? { color: '#fff' } : undefined}
+                  style={[styles.envBtn, { backgroundColor: !hasInjury ? colors.accent : colors.surface }]}
+                  labelStyle={{ color: colors.textPrimary }}
                 >
-                  No, I'm good
+                  No
                 </Button>
               </View>
 
@@ -608,28 +608,28 @@ const styles = StyleSheet.create({
   input: { marginTop: 4, marginBottom: 12 },
   painGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 12 },
   painBtn: { width: 48, minWidth: 0 },
-  painBtnLabel: { fontSize: 14, fontWeight: '700' },
+  painBtnLabel: { fontSize: 14, fontWeight: '700', color: '#e8e4dd' },
   feelingLabel: { borderRadius: 8, padding: 10, alignItems: 'center', marginVertical: 8 },
   feelingLabelText: { fontWeight: '700', fontSize: 15 },
   daysGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginVertical: 12 },
   dayBtn: { flex: 1, minWidth: 0 },
-  dayBtnLabel: { fontSize: 14, fontWeight: '700' },
+  dayBtnLabel: { fontSize: 14, fontWeight: '700', color: '#e8e4dd' },
   daysDesc: { borderRadius: 8, padding: 12 },
   daysDescText: { fontSize: 13, lineHeight: 18 },
   envRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   envBtn: { flex: 1 },
   paceGrid: { gap: 8, marginVertical: 8 },
   paceBtn: { width: '100%' },
-  paceBtnLabel: { fontSize: 13 },
+  paceBtnLabel: { fontSize: 13, color: '#e8e4dd' },
   treadmillNote: { borderRadius: 8, padding: 10, marginTop: 12, fontSize: 12 },
   courseGrid: { gap: 10, marginVertical: 12 },
   courseBtn: { width: '100%' },
-  courseBtnLabel: { fontSize: 13 },
+  courseBtnLabel: { fontSize: 13, color: '#e8e4dd' },
   hillNote: { borderRadius: 8, padding: 12 },
   hillNoteText: { fontSize: 13, lineHeight: 18 },
   goalGrid: { gap: 10, marginVertical: 12 },
   goalBtn: { width: '100%' },
-  goalBtnLabel: { fontSize: 13 },
+  goalBtnLabel: { fontSize: 13, color: '#e8e4dd' },
   goalDesc: { fontSize: 13, fontStyle: 'italic', marginTop: 4 },
   distanceGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
   distBtn: { minWidth: 0 },
