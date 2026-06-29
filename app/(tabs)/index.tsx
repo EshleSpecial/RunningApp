@@ -252,7 +252,7 @@ export default function Dashboard() {
             {weekMilesDone.toFixed(1)} / {weekMilesTarget.toFixed(1)} mi
           </Text>
         </View>
-        <ProgressBar progress={Math.min(weekProgress, 1)} color={theme.colors.primary} style={s.progressBar} />
+        <ProgressBar progress={Math.min(weekProgress, 1)} color={theme.colors.accent} style={s.progressBar} />
       </Surface>
 
       {/* Feeling check-in */}
@@ -322,11 +322,11 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     greeting: { marginBottom: theme.spacing.md },
     greetingText: { fontWeight: '800', color: theme.colors.primary },
-    dateText: { color: theme.colors.text, opacity: 0.6, marginTop: 2 },
+    dateText: { color: theme.colors.textSecondary, marginTop: 2 },
     phaseChip: { alignSelf: 'flex-start', marginTop: theme.spacing.sm, backgroundColor: theme.colors.surface },
     phaseChipText: { color: theme.colors.primary, fontSize: theme.typography.xs },
     countdownSection: { marginBottom: theme.spacing.md },
-    sectionLabel: { fontWeight: '700', color: theme.colors.text, marginBottom: theme.spacing.sm },
+    sectionLabel: { fontWeight: '700', color: theme.colors.textPrimary, marginBottom: theme.spacing.sm },
     countdownRow: { flexDirection: 'row', gap: theme.spacing.sm },
     countdown: {
       flex: 1,
@@ -342,7 +342,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     countdownNum: { fontSize: 34, fontWeight: '900', color: theme.colors.primary, lineHeight: 36 },
     countdownDaysLabel: { fontSize: theme.typography.xs, color: theme.colors.primary, fontWeight: '700', opacity: 0.7, marginTop: -2 },
     countdownRaceDay: { fontSize: 16, fontWeight: '900', color: theme.colors.accent, textAlign: 'center', lineHeight: 18 },
-    countdownLabel: { fontSize: theme.typography.xs, color: theme.colors.text, textAlign: 'center', marginTop: 4, opacity: 0.7 },
+    countdownLabel: { fontSize: theme.typography.xs, color: theme.colors.textSecondary, textAlign: 'center', marginTop: 4 },
     countdownLabelToday: { color: theme.colors.accent, opacity: 1, fontWeight: '700' },
     countdownDist: { fontSize: theme.typography.xs, color: theme.colors.primary, fontWeight: '600', marginTop: 2 },
     noRacesCard: {
@@ -351,11 +351,11 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       backgroundColor: theme.colors.surface,
       marginBottom: theme.spacing.md,
     },
-    noRacesText: { color: theme.colors.text, opacity: 0.5, fontSize: theme.typography.sm, textAlign: 'center' },
+    noRacesText: { color: theme.colors.textSecondary, fontSize: theme.typography.sm, textAlign: 'center' },
     card: { borderRadius: theme.borderRadius.md, padding: 14, backgroundColor: theme.colors.surface, marginBottom: 12 },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-    cardTitle: { fontWeight: '700', color: theme.colors.text },
-    milesText: { color: theme.colors.text, opacity: 0.6 },
+    cardTitle: { fontWeight: '700', color: theme.colors.textPrimary },
+    milesText: { color: theme.colors.textSecondary },
     progressBar: { height: 8, borderRadius: 4 },
     feelingGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginVertical: theme.spacing.sm },
     feelingBtn: { width: 44, minWidth: 0 },
@@ -372,8 +372,8 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       fontSize: theme.typography.sm,
     },
     divider: { marginVertical: 12 },
-    sectionTitle: { fontWeight: '700', color: theme.colors.text, marginBottom: 8 },
-    noWorkout: { color: theme.colors.text, opacity: 0.6, textAlign: 'center', paddingVertical: 8 },
+    sectionTitle: { fontWeight: '700', color: theme.colors.textPrimary, marginBottom: 8 },
+    noWorkout: { color: theme.colors.textSecondary, textAlign: 'center', paddingVertical: 8 },
     ptNudge: {
       borderRadius: theme.borderRadius.md,
       padding: 14,
@@ -386,19 +386,19 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     quoteCard: {
       borderRadius: theme.borderRadius.md,
       padding: 14,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.quoteBg,
       marginBottom: theme.spacing.md,
       borderLeftWidth: 3,
-      borderLeftColor: theme.colors.primary,
+      borderLeftColor: theme.colors.accent,
     },
     quoteText: {
-      color: theme.colors.text,
+      color: theme.colors.textPrimary,
       fontSize: theme.typography.sm,
       fontStyle: 'italic',
       lineHeight: 19,
     },
     quoteAuthor: {
-      color: theme.colors.primary,
+      color: theme.colors.accent,
       fontSize: theme.typography.xs,
       fontWeight: '600',
       marginTop: 6,
@@ -407,7 +407,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     streakCard: {
       borderRadius: theme.borderRadius.md,
       padding: 12,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.streakBg,
       marginBottom: 12,
       borderLeftWidth: 3,
       borderLeftColor: theme.colors.accent,
@@ -418,7 +418,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       gap: 6,
     },
     streakCount: { fontSize: 28, fontWeight: '900', color: theme.colors.accent },
-    streakLabel: { fontSize: theme.typography.sm, color: theme.colors.text, fontWeight: '600', flex: 1 },
+    streakLabel: { fontSize: theme.typography.sm, color: theme.colors.textPrimary, fontWeight: '600', flex: 1 },
     streakBadge: { fontSize: 24 },
     streakBest: { fontSize: theme.typography.xs, color: theme.colors.accent, marginTop: 2 },
   });

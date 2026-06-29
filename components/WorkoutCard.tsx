@@ -70,6 +70,7 @@ export default function WorkoutCard({
   const [cooldownOpen, setCooldownOpen] = useState(false);
 
   const config = TYPE_CONFIG[workout.type] ?? TYPE_CONFIG.rest;
+  const wc = colors.workoutColors[workout.type as keyof typeof colors.workoutColors] ?? colors.workoutColors.rest;
   const completed = logEntry?.completed ?? false;
   const swapped = logEntry?.swappedToCrossTraining ?? false;
 
@@ -88,18 +89,18 @@ export default function WorkoutCard({
 
   return (
     <Card
-      style={[styles.card, { borderLeftColor: config.color, opacity: completed ? 0.6 : 1, backgroundColor: colors.surface }]}
+      style={[styles.card, { borderLeftColor: wc.accent, opacity: completed ? 0.6 : 1, backgroundColor: colors.surface }]}
       mode="elevated"
     >
       <Card.Content>
         <View style={styles.header}>
           <View style={styles.titleRow}>
             <View>
-              <Text variant="titleMedium" style={{ color: config.color, fontWeight: '700' }}>
+              <Text variant="titleMedium" style={{ color: wc.accent, fontWeight: '700' }}>
                 {displayLabel}
               </Text>
               {subtitleParts.length > 0 && (
-                <Text variant="bodySmall" style={{ color: colors.text + 'aa', marginTop: 1 }}>
+                <Text variant="bodySmall" style={{ color: colors.textSecondary, marginTop: 1 }}>
                   {subtitleParts.join('  ·  ')}
                 </Text>
               )}
@@ -114,7 +115,7 @@ export default function WorkoutCard({
 
         {!compact && (
           <>
-            <Text variant="bodySmall" style={[styles.notes, { color: colors.text }]}>{workout.notes}</Text>
+            <Text variant="bodySmall" style={[styles.notes, { color: colors.textPrimary }]}>{workout.notes}</Text>
 
             {/* Treadmill settings */}
             {treadmill && (
@@ -131,7 +132,7 @@ export default function WorkoutCard({
                 <Text style={[styles.fuelingTitle, { color: colors.warning }]}>
                   Fueling: {fuelingPlan.gelsNeeded} gel{fuelingPlan.gelsNeeded !== 1 ? 's' : ''}
                 </Text>
-                <Text style={[styles.fuelingDetail, { color: colors.text }]}>
+                <Text style={[styles.fuelingDetail, { color: colors.textPrimary }]}>
                   Take at: {fuelingPlan.gelScheduleMin.map(m => `${m} min`).join(', ')}
                   {'\n'}
                   Water: ~{fuelingPlan.waterOzPerHour} oz/hr · Est. {fuelingPlan.estimatedTimeMin} min on feet
@@ -141,19 +142,19 @@ export default function WorkoutCard({
 
             {/* Warmup accordion */}
             {isRunType && (
-              <View style={[styles.accordionSection, { borderColor: colors.text + '22' }]}>
+              <View style={[styles.accordionSection, { borderColor: colors.border }]}>
                 <TouchableOpacity
                   onPress={() => setWarmupOpen(v => !v)}
-                  style={[styles.accordionHeader, { backgroundColor: colors.text + '08' }]}
+                  style={[styles.accordionHeader, { backgroundColor: colors.surfaceAlt }]}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.accordionTitle, { color: colors.text }]}>Warmup</Text>
-                  <Text style={[styles.accordionChevron, { color: colors.text + 'aa' }]}>{warmupOpen ? '▲' : '▼'}</Text>
+                  <Text style={[styles.accordionTitle, { color: colors.textPrimary }]}>Warmup</Text>
+                  <Text style={[styles.accordionChevron, { color: colors.textSecondary }]}>{warmupOpen ? '▲' : '▼'}</Text>
                 </TouchableOpacity>
                 {warmupOpen && (
                   <View style={[styles.accordionBody, { backgroundColor: colors.surface }]}>
                     {WARMUP_STEPS.map((step, i) => (
-                      <Text key={i} style={[styles.accordionItem, { color: colors.text }]}>• {step}</Text>
+                      <Text key={i} style={[styles.accordionItem, { color: colors.textPrimary }]}>• {step}</Text>
                     ))}
                   </View>
                 )}
@@ -162,24 +163,24 @@ export default function WorkoutCard({
 
             {/* Cooldown & rollout accordion */}
             {isRunType && (
-              <View style={[styles.accordionSection, { borderColor: colors.text + '22' }]}>
+              <View style={[styles.accordionSection, { borderColor: colors.border }]}>
                 <TouchableOpacity
                   onPress={() => setCooldownOpen(v => !v)}
-                  style={[styles.accordionHeader, { backgroundColor: colors.text + '08' }]}
+                  style={[styles.accordionHeader, { backgroundColor: colors.surfaceAlt }]}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.accordionTitle, { color: colors.text }]}>Cooldown & Rollout</Text>
-                  <Text style={[styles.accordionChevron, { color: colors.text + 'aa' }]}>{cooldownOpen ? '▲' : '▼'}</Text>
+                  <Text style={[styles.accordionTitle, { color: colors.textPrimary }]}>Cooldown & Rollout</Text>
+                  <Text style={[styles.accordionChevron, { color: colors.textSecondary }]}>{cooldownOpen ? '▲' : '▼'}</Text>
                 </TouchableOpacity>
                 {cooldownOpen && (
                   <View style={[styles.accordionBody, { backgroundColor: colors.surface }]}>
-                    <Text style={[styles.accordionSubheader, { color: colors.text + 'aa' }]}>Cooldown</Text>
+                    <Text style={[styles.accordionSubheader, { color: colors.textSecondary }]}>Cooldown</Text>
                     {COOLDOWN_STEPS.map((step, i) => (
-                      <Text key={i} style={[styles.accordionItem, { color: colors.text }]}>• {step}</Text>
+                      <Text key={i} style={[styles.accordionItem, { color: colors.textPrimary }]}>• {step}</Text>
                     ))}
-                    <Text style={[styles.accordionSubheader, { color: colors.text + 'aa', marginTop: 10 }]}>Foam Roll</Text>
+                    <Text style={[styles.accordionSubheader, { color: colors.textSecondary, marginTop: 10 }]}>Foam Roll</Text>
                     {ROLLOUT_STEPS.map((step, i) => (
-                      <Text key={i} style={[styles.accordionItem, { color: colors.text }]}>• {step}</Text>
+                      <Text key={i} style={[styles.accordionItem, { color: colors.textPrimary }]}>• {step}</Text>
                     ))}
                   </View>
                 )}
@@ -210,7 +211,7 @@ export default function WorkoutCard({
               Swap to Cross-Train
             </Button>
           )}
-          <Button mode="contained" onPress={onComplete} style={{ backgroundColor: config.color }}>
+          <Button mode="contained" onPress={onComplete} style={{ backgroundColor: wc.accent }}>
             Mark Complete
           </Button>
         </Card.Actions>

@@ -1,7 +1,5 @@
 import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Appearance } from 'react-native';
-import { PaperProvider, MD3LightTheme, MD3DarkTheme, configureFonts } from 'react-native-paper';
+import { PaperProvider, MD3DarkTheme, configureFonts } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const fontConfig = {
@@ -22,18 +20,6 @@ const fontConfig = {
   bodySmall: { fontFamily: 'System', fontSize: 12, fontWeight: '400' as const, letterSpacing: 0.4, lineHeight: 16 },
 };
 
-const lightTheme = {
-  ...MD3LightTheme,
-  fonts: configureFonts({ config: fontConfig }),
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: '#1a2f5a',
-    secondary: '#E8832A',
-    primaryContainer: '#dbeafe',
-    secondaryContainer: '#fef3c7',
-  },
-};
-
 const darkTheme = {
   ...MD3DarkTheme,
   fonts: configureFonts({ config: fontConfig }),
@@ -47,16 +33,9 @@ const darkTheme = {
 };
 
 export default function RootLayout() {
-  const [scheme, setScheme] = useState(Appearance.getColorScheme());
-  useEffect(() => {
-    const sub = Appearance.addChangeListener(({ colorScheme }) => setScheme(colorScheme));
-    return () => sub.remove();
-  }, []);
-  const theme = scheme === 'dark' ? darkTheme : lightTheme;
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <PaperProvider theme={theme}>
+      <PaperProvider theme={darkTheme}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" />

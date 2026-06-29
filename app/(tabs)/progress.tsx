@@ -58,27 +58,27 @@ export default function ProgressScreen() {
 
       {/* Streak */}
       <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
-        <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.text }]}>Current Streak</Text>
+        <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Current Streak</Text>
         <View style={styles.streakRow}>
           <Text style={[styles.streakNum, { color: colors.accent }]}>{streak}</Text>
           <Text style={[styles.streakDays, { color: colors.accent }]}>days</Text>
         </View>
         <View style={styles.streakStats}>
           <View style={styles.streakStat}>
-            <Text style={[styles.streakStatVal, { color: colors.primary }]}>{streakMeta.longestStreak}</Text>
-            <Text style={[styles.streakStatLabel, { color: colors.text }]}>Best streak</Text>
+            <Text style={[styles.streakStatVal, { color: colors.accent }]}>{streakMeta.longestStreak}</Text>
+            <Text style={[styles.streakStatLabel, { color: colors.textPrimary }]}>Best streak</Text>
           </View>
-          <View style={[styles.streakDivider, { backgroundColor: colors.text + '22' }]} />
+          <View style={[styles.streakDivider, { backgroundColor: colors.border }]} />
           <View style={styles.streakStat}>
-            <Text style={[styles.streakStatVal, { color: colors.primary }]}>{totalDone}</Text>
-            <Text style={[styles.streakStatLabel, { color: colors.text }]}>Total workouts</Text>
+            <Text style={[styles.streakStatVal, { color: colors.accent }]}>{totalDone}</Text>
+            <Text style={[styles.streakStatLabel, { color: colors.textPrimary }]}>Total workouts</Text>
           </View>
         </View>
       </Surface>
 
       {/* Milestone badges */}
       <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
-        <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.text }]}>Milestone Badges</Text>
+        <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Milestone Badges</Text>
         <View style={styles.badgeGrid}>
           {MILESTONE_BADGES.map(badge => {
             const isEarned = earned.some(e => e.id === badge.id);
@@ -87,13 +87,13 @@ export default function ProgressScreen() {
                 key={badge.id}
                 style={[
                   styles.badge,
-                  { backgroundColor: isEarned ? colors.warning + '33' : colors.text + '11' },
+                  { backgroundColor: isEarned ? colors.warning + '33' : colors.border },
                 ]}
               >
                 <Text style={[styles.badgeEmoji, !isEarned && styles.badgeEmojiLocked]}>
                   {isEarned ? badge.emoji : ''}
                 </Text>
-                <Text style={[styles.badgeLabel, { color: isEarned ? colors.warning : colors.text + '66' }]}>
+                <Text style={[styles.badgeLabel, { color: isEarned ? colors.warning : colors.textSecondary }]}>
                   {badge.label}
                 </Text>
               </View>
@@ -106,20 +106,20 @@ export default function ProgressScreen() {
 
       {/* Race predictions */}
       <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
-        <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.text }]}>Race Time Predictions</Text>
-        <Text style={[styles.predictionNote, { color: colors.text + 'aa' }]}>
+        <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Race Time Predictions</Text>
+        <Text style={[styles.predictionNote, { color: colors.textSecondary }]}>
           {basedOnActual
             ? `Based on your logged pace of ${formatPace(basePace)}/mi`
             : `Based on your easy pace of ${formatPace(profile.currentPaceMinPerMile ?? 13)}/mi`}
         </Text>
         {predictions.map(p => (
-          <View key={p.name} style={[styles.predRow, { borderBottomColor: colors.text + '11' }]}>
-            <Text style={[styles.predName, { color: colors.text }]}>{p.name}</Text>
-            <Text style={[styles.predTime, { color: colors.primary }]}>{p.formattedTime}</Text>
+          <View key={p.name} style={[styles.predRow, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.predName, { color: colors.textPrimary }]}>{p.name}</Text>
+            <Text style={[styles.predTime, { color: colors.accent }]}>{p.formattedTime}</Text>
           </View>
         ))}
         {!basedOnActual && (
-          <Text style={[styles.predHint, { color: colors.text + 'aa' }]}>
+          <Text style={[styles.predHint, { color: colors.textSecondary }]}>
             Log your actual pace after runs to improve predictions.
           </Text>
         )}
@@ -128,22 +128,22 @@ export default function ProgressScreen() {
       {/* Pace history */}
       {paceHistory.length > 0 && (
         <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
-          <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.text }]}>Recent Run Paces</Text>
+          <Text variant="titleSmall" style={[styles.cardTitle, { color: colors.textPrimary }]}>Recent Run Paces</Text>
           {paceHistory.map((entry, i) => (
-            <View key={i} style={[styles.paceRow, { borderBottomColor: colors.text + '11' }]}>
+            <View key={i} style={[styles.paceRow, { borderBottomColor: colors.border }]}>
               <View>
-                <Text style={[styles.paceDate, { color: colors.text }]}>{format(parseISO(entry.date), 'MMM d')}</Text>
-                <Text style={[styles.paceDist, { color: colors.text + 'aa' }]}>{entry.miles} mi</Text>
+                <Text style={[styles.paceDate, { color: colors.textPrimary }]}>{format(parseISO(entry.date), 'MMM d')}</Text>
+                <Text style={[styles.paceDist, { color: colors.textSecondary }]}>{entry.miles} mi</Text>
               </View>
-              <Text style={[styles.pacePace, { color: colors.primary }]}>{formatPace(entry.paceMinPerMile)}/mi</Text>
+              <Text style={[styles.pacePace, { color: colors.accent }]}>{formatPace(entry.paceMinPerMile)}/mi</Text>
             </View>
           ))}
         </Surface>
       )}
 
       {paceHistory.length === 0 && (
-        <Surface style={[styles.card, styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.text + '22' }]} elevation={0}>
-          <Text style={[styles.emptyText, { color: colors.text + 'aa' }]}>
+        <Surface style={[styles.card, styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]} elevation={0}>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
             Complete runs and log your pace to see it here.
           </Text>
         </Surface>

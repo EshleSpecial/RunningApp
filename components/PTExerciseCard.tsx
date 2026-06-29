@@ -30,13 +30,13 @@ export default function PTExerciseCard({ exercise, completed, onToggle }: Props)
               variant="titleSmall"
               style={[
                 styles.name,
-                { color: colors.text },
+                { color: colors.textPrimary },
                 completed && styles.completedName,
               ]}
             >
               {exercise.name}
             </Text>
-            <Text variant="bodySmall" style={{ color: colors.text + '88', marginTop: 2 }}>
+            <Text variant="bodySmall" style={{ color: colors.textSecondary, marginTop: 2 }}>
               {setsReps}
             </Text>
           </View>
@@ -49,7 +49,7 @@ export default function PTExerciseCard({ exercise, completed, onToggle }: Props)
             <IconButton
               icon={completed ? 'checkbox-marked-circle' : 'checkbox-blank-circle-outline'}
               size={26}
-              iconColor={completed ? colors.success : colors.text + '55'}
+              iconColor={completed ? colors.success : colors.textSecondary}
               onPress={onToggle}
             />
           </View>
@@ -58,14 +58,14 @@ export default function PTExerciseCard({ exercise, completed, onToggle }: Props)
         {expanded && (
           <View style={styles.detail}>
             <Divider style={styles.divider} />
-            <Text variant="bodySmall" style={[styles.description, { color: colors.text }]}>
+            <Text variant="bodySmall" style={[styles.description, { color: colors.textPrimary }]}>
               {exercise.description}
             </Text>
-            <View style={[styles.tipBox, { backgroundColor: colors.primary + '11' }]}>
-              <Text variant="bodySmall" style={[styles.tipLabel, { color: colors.primary }]}>
+            <View style={[styles.tipBox, { backgroundColor: colors.surfaceAlt }]}>
+              <Text variant="bodySmall" style={[styles.tipLabel, { color: colors.accent }]}>
                 PT Tip
               </Text>
-              <Text variant="bodySmall" style={[styles.tipText, { color: colors.text }]}>
+              <Text variant="bodySmall" style={[styles.tipText, { color: colors.textPrimary }]}>
                 {exercise.tip}
               </Text>
             </View>

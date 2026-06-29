@@ -175,13 +175,13 @@ export default function Onboarding() {
       <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Text variant="headlineMedium" style={[styles.title, { color: colors.primary }]}>Race Training</Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: colors.text }]}>Let's build your plan</Text>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: colors.textPrimary }]}>Let's build your plan</Text>
           <ProgressBar
             progress={displayProgress}
-            color={colors.primary}
+            color={colors.accent}
             style={styles.progress}
           />
-          <Text style={[styles.stepLabel, { color: colors.text }]}>Step {displayStep} of {STEPS}</Text>
+          <Text style={[styles.stepLabel, { color: colors.textSecondary }]}>Step {displayStep} of {STEPS}</Text>
         </View>
 
         <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={2}>
@@ -190,7 +190,7 @@ export default function Onboarding() {
           {step === 0 && (
             <View>
               <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>What's your name?</Text>
-              <Text style={[styles.stepDesc, { color: colors.text }]}>Just so the app can cheer you on.</Text>
+              <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>Just so the app can cheer you on.</Text>
               <TextInput
                 label="Your name"
                 value={name}
@@ -208,7 +208,7 @@ export default function Onboarding() {
           {step === 1 && (
             <View>
               <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Current weekly mileage</Text>
-              <Text style={[styles.stepDesc, { color: colors.text }]}>
+              <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 How many miles per week are you running right now? Enter 0 if you're just starting back.
               </Text>
               <TextInput
@@ -230,7 +230,7 @@ export default function Onboarding() {
           {step === 2 && (
             <View>
               <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>How are you feeling overall?</Text>
-              <Text style={[styles.stepDesc, { color: colors.text }]}>
+              <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 Rate your current overall wellbeing. This helps calibrate your starting point.
               </Text>
               <View style={styles.painGrid}>
@@ -259,7 +259,7 @@ export default function Onboarding() {
           {step === 3 && (
             <View>
               <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Training days per week</Text>
-              <Text style={[styles.stepDesc, { color: colors.text }]}>
+              <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 How many days per week can you realistically commit to training?
                 Your plan will fit within this schedule.
               </Text>
@@ -286,7 +286,7 @@ export default function Onboarding() {
           {step === 4 && (
             <View>
               <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Your training setup</Text>
-              <Text style={[styles.stepDesc, { color: colors.text }]}>Where will you be running most of the time?</Text>
+              <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>Where will you be running most of the time?</Text>
               <View style={styles.envRow}>
                 <Button
                   mode={!prefersTreadmill ? 'contained' : 'outlined'}
@@ -307,7 +307,7 @@ export default function Onboarding() {
                   Treadmill
                 </Button>
               </View>
-              <Text style={[styles.stepDesc, { marginTop: 20, color: colors.text }]}>
+              <Text style={[styles.stepDesc, { marginTop: 20, color: colors.textPrimary }]}>
                 What's your comfortable easy running pace?
               </Text>
               <View style={styles.paceGrid}>
@@ -335,7 +335,7 @@ export default function Onboarding() {
           {step === 5 && (
             <View>
               <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Race course terrain</Text>
-              <Text style={[styles.stepDesc, { color: colors.text }]}>
+              <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 How hilly is your race course? Your plan will include terrain-specific training.
               </Text>
               <View style={styles.courseGrid}>
@@ -384,7 +384,7 @@ export default function Onboarding() {
                 ))}
               </View>
               {selectedGoal && (
-                <Text style={[styles.goalDesc, { color: colors.text }]}>{selectedGoal.desc}</Text>
+                <Text style={[styles.goalDesc, { color: colors.textPrimary }]}>{selectedGoal.desc}</Text>
               )}
             </View>
           )}
@@ -396,7 +396,7 @@ export default function Onboarding() {
 
               {goalType === 'no_date_plan' ? (
                 <>
-                  <Text style={[styles.stepDesc, { color: colors.text }]}>
+                  <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                     How many weeks would you like your training plan to be?
                   </Text>
                   <View style={styles.daysGrid}>
@@ -415,7 +415,7 @@ export default function Onboarding() {
                 </>
               ) : (
                 <>
-                  <Text style={[styles.stepDesc, { color: colors.text }]}>
+                  <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                     {goalType === 'multi_race'
                       ? "Add each race you're training for. You can add more later."
                       : 'Add your goal race.'}
@@ -437,7 +437,7 @@ export default function Onboarding() {
                     placeholder="2026-10-31"
                   />
 
-                  <Text style={[styles.fieldLabel, { color: colors.text }]}>Distance</Text>
+                  <Text style={[styles.fieldLabel, { color: colors.textPrimary }]}>Distance</Text>
                   <View style={styles.distanceGrid}>
                     {DISTANCE_OPTIONS.map(opt => (
                       <Button
@@ -479,7 +479,7 @@ export default function Onboarding() {
                       <View style={styles.raceItemRow}>
                         <View style={{ flex: 1 }}>
                           <Text style={[styles.raceItemName, { color: colors.primary }]}>{race.name}</Text>
-                          <Text style={[styles.raceItemDetail, { color: colors.text }]}>{race.date} · {race.distanceMiles} mi</Text>
+                          <Text style={[styles.raceItemDetail, { color: colors.textPrimary }]}>{race.date} · {race.distanceMiles} mi</Text>
                         </View>
                         <Button
                           mode="text"
@@ -522,7 +522,7 @@ export default function Onboarding() {
 
               {hasInjury && (
                 <>
-                  <Text style={[styles.stepDesc, { marginTop: 16, color: colors.text }]}>Select your injury:</Text>
+                  <Text style={[styles.stepDesc, { marginTop: 16, color: colors.textPrimary }]}>Select your injury:</Text>
                   <View style={styles.injuryGrid}>
                     {INJURY_OPTIONS.map(inj => (
                       <Button
@@ -546,7 +546,7 @@ export default function Onboarding() {
                     multiline
                     numberOfLines={2}
                   />
-                  <Text style={[styles.injuryNote, { color: colors.text }]}>
+                  <Text style={[styles.injuryNote, { color: colors.textPrimary }]}>
                     Your warmups, cooldowns, and runs will be tailored to support your recovery.
                   </Text>
                 </>

@@ -64,7 +64,7 @@ export default function PTScreen() {
         <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>
           Injury & Recovery
         </Text>
-        <Text variant="bodySmall" style={{ color: colors.primary, marginTop: 2 }}>
+        <Text variant="bodySmall" style={{ color: colors.accent, marginTop: 2 }}>
           Exercises & rehabilitation
         </Text>
       </View>
@@ -72,7 +72,7 @@ export default function PTScreen() {
       {/* Today's session */}
       <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
         <View style={styles.sessionHeader}>
-          <Text variant="titleMedium" style={[styles.sessionTitle, { color: colors.text }]}>
+          <Text variant="titleMedium" style={[styles.sessionTitle, { color: colors.textPrimary }]}>
             Today's Session
           </Text>
           <Text style={[
@@ -102,11 +102,11 @@ export default function PTScreen() {
       </Surface>
 
       {/* Why these exercises */}
-      <Surface style={[styles.infoCard, { backgroundColor: colors.primary + '11' }]} elevation={1}>
-        <Text variant="titleSmall" style={[styles.infoTitle, { color: colors.primary }]}>
+      <Surface style={[styles.infoCard, { backgroundColor: colors.surfaceAlt }]} elevation={1}>
+        <Text variant="titleSmall" style={[styles.infoTitle, { color: colors.accent }]}>
           Why These Exercises?
         </Text>
-        <Text style={[styles.infoText, { color: colors.text }]}>
+        <Text style={[styles.infoText, { color: colors.textPrimary }]}>
           The gluteus minimus stabilizes your pelvis during the single-leg stance phase of running.
           A tear reduces this stability, causing compensatory patterns that can lead to IT band pain,
           knee issues, and altered gait.{'\n\n'}
@@ -118,10 +118,10 @@ export default function PTScreen() {
       <Divider style={styles.divider} />
 
       {/* Full library */}
-      <Text variant="titleMedium" style={[styles.libraryTitle, { color: colors.text }]}>
+      <Text variant="titleMedium" style={[styles.libraryTitle, { color: colors.textPrimary }]}>
         Full Exercise Library
       </Text>
-      <Text variant="bodySmall" style={[styles.librarySubtitle, { color: colors.text + 'aa' }]}>
+      <Text variant="bodySmall" style={[styles.librarySubtitle, { color: colors.textSecondary }]}>
         Tap any exercise to see full instructions
       </Text>
 

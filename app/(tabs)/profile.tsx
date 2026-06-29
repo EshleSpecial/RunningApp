@@ -172,22 +172,22 @@ export default function ProfileScreen() {
     <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Profile</Text>
-        <Text variant="bodySmall" style={[styles.subtitle, { color: colors.text }]}>{profile.name}'s Training Journey</Text>
+        <Text variant="bodySmall" style={[styles.subtitle, { color: colors.textSecondary }]}>{profile.name}'s Training Journey</Text>
       </View>
 
       <Surface style={[styles.card, { backgroundColor: colors.surface }]} elevation={1}>
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Name</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Name</Text>
           {editing ? (
             <TextInput value={name} onChangeText={setName} mode="outlined" dense style={[styles.inlineInput, { backgroundColor: colors.surface }]} />
           ) : (
-            <Text style={[styles.value, { color: colors.text }]}>{profile.name}</Text>
+            <Text style={[styles.value, { color: colors.textPrimary }]}>{profile.name}</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Weekly mileage</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Weekly mileage</Text>
           {editing ? (
             <TextInput
               value={weeklyMiles}
@@ -199,37 +199,37 @@ export default function ProfileScreen() {
               right={<TextInput.Affix text="mi" />}
             />
           ) : (
-            <Text style={[styles.value, { color: colors.text }]}>{profile.currentWeeklyMiles} mi/wk</Text>
+            <Text style={[styles.value, { color: colors.textPrimary }]}>{profile.currentWeeklyMiles} mi/wk</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Feeling level</Text>
-          <Text style={[styles.value, { color: colors.text }]}>{profile.feelingLevel ?? '—'} / 10</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Feeling level</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{profile.feelingLevel ?? '—'} / 10</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Goal type</Text>
-          <Text style={[styles.value, { color: colors.text }]}>{(profile.goalType ?? 'general_training').replace(/_/g, ' ')}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Goal type</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{(profile.goalType ?? 'general_training').replace(/_/g, ' ')}</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Races</Text>
-          <Text style={[styles.value, { color: colors.text }]}>{(profile.races ?? []).length} added</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Races</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{(profile.races ?? []).length} added</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Injury</Text>
-          <Text style={[styles.value, { color: colors.text }]}>{profile.injury ? profile.injury.type : 'None'}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Injury</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{profile.injury ? profile.injury.type : 'None'}</Text>
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Training days/week</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Training days/week</Text>
           {editing ? (
             <View style={styles.daysRow}>
               {[3, 4, 5, 6].map(d => (
@@ -246,13 +246,13 @@ export default function ProfileScreen() {
               ))}
             </View>
           ) : (
-            <Text style={[styles.value, { color: colors.text }]}>{profile.trainingDaysPerWeek ?? 5} days</Text>
+            <Text style={[styles.value, { color: colors.textPrimary }]}>{profile.trainingDaysPerWeek ?? 5} days</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Running surface</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Running surface</Text>
           {editing ? (
             <View style={styles.envRow}>
               <Button
@@ -275,13 +275,13 @@ export default function ProfileScreen() {
               </Button>
             </View>
           ) : (
-            <Text style={[styles.value, { color: colors.text }]}>{(profile.prefersTreadmill ?? false) ? 'Treadmill' : 'Outdoor'}</Text>
+            <Text style={[styles.value, { color: colors.textPrimary }]}>{(profile.prefersTreadmill ?? false) ? 'Treadmill' : 'Outdoor'}</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Easy pace</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Easy pace</Text>
           {editing ? (
             <View style={styles.paceCol}>
               {[
@@ -304,13 +304,13 @@ export default function ProfileScreen() {
               ))}
             </View>
           ) : (
-            <Text style={[styles.value, { color: colors.text }]}>{formatPace(profile.currentPaceMinPerMile ?? 13.0)}</Text>
+            <Text style={[styles.value, { color: colors.textPrimary }]}>{formatPace(profile.currentPaceMinPerMile ?? 13.0)}</Text>
           )}
         </View>
         <Divider style={styles.rowDivider} />
 
         <View style={styles.cardRow}>
-          <Text style={[styles.label, { color: colors.text }]}>Course terrain</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Course terrain</Text>
           {editing ? (
             <View style={styles.courseRow}>
               {(['flat', 'rolling', 'hilly', 'very_hilly'] as const).map(d => (
@@ -327,7 +327,7 @@ export default function ProfileScreen() {
               ))}
             </View>
           ) : (
-            <Text style={[styles.value, { color: colors.text }]}>{(profile.raceCourseDifficulty ?? 'flat').replace('_', ' ')}</Text>
+            <Text style={[styles.value, { color: colors.textPrimary }]}>{(profile.raceCourseDifficulty ?? 'flat').replace('_', ' ')}</Text>
           )}
         </View>
       </Surface>
@@ -354,8 +354,8 @@ export default function ProfileScreen() {
         {stravaTokens ? (
           <>
             <View style={styles.stravaConnected}>
-              <Text style={[styles.stravaAthleteLabel, { color: colors.text }]}>Connected as</Text>
-              <Text style={[styles.stravaAthleteName, { color: colors.text }]}>{stravaTokens.athleteName}</Text>
+              <Text style={[styles.stravaAthleteLabel, { color: colors.textPrimary }]}>Connected as</Text>
+              <Text style={[styles.stravaAthleteName, { color: colors.textPrimary }]}>{stravaTokens.athleteName}</Text>
             </View>
             {syncStatus && (
               <Text style={[styles.syncStatus, { color: colors.success, backgroundColor: colors.success + '22' }]}>{syncStatus}</Text>
@@ -385,7 +385,7 @@ export default function ProfileScreen() {
           </>
         ) : (
           <>
-            <Text style={[styles.stravaDesc, { color: colors.text }]}>
+            <Text style={[styles.stravaDesc, { color: colors.textPrimary }]}>
               Connect Strava to auto-import your runs. Works with Garmin, Apple Watch, and any Strava-connected device.
             </Text>
             <Button
@@ -407,7 +407,7 @@ export default function ProfileScreen() {
       {/* About */}
       <Surface style={[styles.aboutCard, { backgroundColor: colors.surface }]} elevation={0}>
         <Text variant="titleSmall" style={[styles.aboutTitle, { color: colors.primary }]}>About Your Plan</Text>
-        <Text style={[styles.aboutText, { color: colors.text }]}>
+        <Text style={[styles.aboutText, { color: colors.textPrimary }]}>
           • Phase 1–2: Build aerobic base and establish consistent weekly mileage{'\n'}
           • Phase 3: Race-specific prep — tempo runs, long efforts, and terrain training{'\n'}
           • Phase 4: Peak and taper leading into race week{'\n'}
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 8,
   },
-  label: { fontSize: 13, flex: 1, opacity: 0.7 },
+  label: { fontSize: 13, flex: 1 },
   value: { fontWeight: '600', fontSize: 14 },
   rowDivider: { marginHorizontal: 14 },
   inlineInput: { flex: 1.5 },

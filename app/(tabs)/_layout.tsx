@@ -16,11 +16,11 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.text + '66',
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
           paddingBottom: 4,
           backgroundColor: colors.surface,
-          borderTopColor: colors.text + '18',
+          borderTopColor: colors.border,
         },
       }}
     >

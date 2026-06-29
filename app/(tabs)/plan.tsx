@@ -103,7 +103,7 @@ export default function PlanScreen() {
       ListHeaderComponent={
         <View style={styles.listHeader}>
           <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Training Plan</Text>
-          <Text variant="bodySmall" style={[styles.subtitle, { color: colors.text }]}>
+          <Text variant="bodySmall" style={[styles.subtitle, { color: colors.accent }]}>
             {plan.length} week{plan.length !== 1 ? 's' : ''} · {raceSubtitle(profile?.races ?? [])}
           </Text>
           <Button
@@ -142,7 +142,7 @@ function WeekBlock({ week, log }: { week: TrainingWeek; log: WorkoutLog }) {
         <Text variant="labelLarge" style={[styles.weekNum, { color: colors.primary }]}>
           Week {week.weekNumber}
         </Text>
-        <Text variant="bodySmall" style={[styles.weekDates, { color: colors.text }]}>
+        <Text variant="bodySmall" style={[styles.weekDates, { color: colors.textSecondary }]}>
           {format(parseISO(week.startDate), 'MMM d')} – {format(weekEnd, 'MMM d')}
         </Text>
         {isCurrentWeek && (

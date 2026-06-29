@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "scheme": "icdht",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "backgroundColor": "#1a2f5a"
     },
@@ -13,7 +13,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.icdht.app",
       "deploymentTarget": "15.1",
-      "userInterfaceStyle": "automatic"
+      "userInterfaceStyle": "light"
     },
     "android": {
       "package": "com.icdht.app",
