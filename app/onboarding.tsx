@@ -189,7 +189,7 @@ export default function Onboarding() {
           {/* Step 0: Name */}
           {step === 0 && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>What's your name?</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>What's your name?</Text>
               <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>Just so the app can cheer you on.</Text>
               <TextInput
                 label="Your name"
@@ -207,7 +207,7 @@ export default function Onboarding() {
           {/* Step 1: Weekly mileage */}
           {step === 1 && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Current weekly mileage</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>Current weekly mileage</Text>
               <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 How many miles per week are you running right now? Enter 0 if you're just starting back.
               </Text>
@@ -229,7 +229,7 @@ export default function Onboarding() {
           {/* Step 2: Feeling level */}
           {step === 2 && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>How are you feeling overall?</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>How are you feeling overall?</Text>
               <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 Rate your current overall wellbeing. This helps calibrate your starting point.
               </Text>
@@ -258,7 +258,7 @@ export default function Onboarding() {
           {/* Step 3: Training days */}
           {step === 3 && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Training days per week</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>Training days per week</Text>
               <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 How many days per week can you realistically commit to training?
                 Your plan will fit within this schedule.
@@ -285,7 +285,7 @@ export default function Onboarding() {
           {/* Step 4: Environment + pace */}
           {step === 4 && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Your training setup</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>Your training setup</Text>
               <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>Where will you be running most of the time?</Text>
               <View style={styles.envRow}>
                 <Button
@@ -324,7 +324,7 @@ export default function Onboarding() {
                 ))}
               </View>
               {prefersTreadmill && (
-                <Text style={[styles.treadmillNote, { color: colors.primary, backgroundColor: colors.surface }]}>
+                <Text style={[styles.treadmillNote, { color: colors.textSecondary, backgroundColor: colors.surface }]}>
                   Your workouts will include treadmill speed and incline recommendations.
                 </Text>
               )}
@@ -334,7 +334,7 @@ export default function Onboarding() {
           {/* Step 5: Course difficulty */}
           {step === 5 && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Race course terrain</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>Race course terrain</Text>
               <Text style={[styles.stepDesc, { color: colors.textPrimary }]}>
                 How hilly is your race course? Your plan will include terrain-specific training.
               </Text>
@@ -358,7 +358,7 @@ export default function Onboarding() {
               </View>
               {(courseDifficulty === 'hilly' || courseDifficulty === 'very_hilly') && (
                 <Surface style={[styles.hillNote, { backgroundColor: colors.surface }]} elevation={0}>
-                  <Text style={[styles.hillNoteText, { color: colors.success }]}>
+                  <Text style={[styles.hillNoteText, { color: colors.textSecondary }]}>
                     Hill training will be added to your mid-week workouts to prepare for your course.
                   </Text>
                 </Surface>
@@ -369,7 +369,7 @@ export default function Onboarding() {
           {/* Step 6: Goal type */}
           {step === 6 && !atRaceStep && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>What's your training goal?</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>What's your training goal?</Text>
               <View style={styles.goalGrid}>
                 {GOAL_OPTIONS.map(opt => (
                   <Button
@@ -392,7 +392,7 @@ export default function Onboarding() {
           {/* Race/plan-length step (virtual, between step 6 and step 7) */}
           {atRaceStep && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Add your race(s)</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>Add your race(s)</Text>
 
               {goalType === 'no_date_plan' ? (
                 <>
@@ -500,7 +500,7 @@ export default function Onboarding() {
           {/* Step 7: Injury */}
           {step === 7 && !atRaceStep && (
             <View>
-              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.primary }]}>Any injuries or pain areas?</Text>
+              <Text variant="titleLarge" style={[styles.stepTitle, { color: colors.textPrimary }]}>Any injuries or pain areas?</Text>
               <View style={styles.injuryToggleRow}>
                 <Button
                   mode={hasInjury ? 'contained' : 'outlined'}
@@ -529,8 +529,8 @@ export default function Onboarding() {
                         key={inj}
                         mode={injuryType === inj ? 'contained' : 'outlined'}
                         onPress={() => setInjuryType(inj)}
-                        style={[styles.injuryBtn, injuryType === inj && { backgroundColor: colors.primary }]}
-                        labelStyle={[{ fontSize: 12 }, injuryType === inj && { color: '#fff' }]}
+                        style={[styles.injuryBtn, { backgroundColor: injuryType === inj ? colors.accent : colors.surface }]}
+                        labelStyle={[{ fontSize: 12, color: injuryType === inj ? '#fff' : colors.textPrimary }]}
                         contentStyle={{ paddingHorizontal: 6, minWidth: 0 }}
                       >
                         {inj}
@@ -558,7 +558,7 @@ export default function Onboarding() {
 
         <View style={styles.navRow}>
           {step > 0 || atRaceStep ? (
-            <Button mode="outlined" onPress={back} style={styles.navBtn}>Back</Button>
+            <Button mode="outlined" onPress={back} style={[styles.navBtn, { borderColor: colors.border }]} textColor={colors.textPrimary}>Back</Button>
           ) : (
             <View style={styles.navBtn} />
           )}
@@ -567,7 +567,7 @@ export default function Onboarding() {
             onPress={next}
             disabled={!canNext || saving}
             loading={saving}
-            style={[styles.navBtn, { backgroundColor: colors.primary }]}
+            style={[styles.navBtn, { backgroundColor: colors.accent }]}
           >
             {step === STEPS - 1 && !atRaceStep ? 'Build My Plan' : 'Next'}
           </Button>

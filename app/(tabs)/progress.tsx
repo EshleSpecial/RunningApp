@@ -54,7 +54,7 @@ export default function ProgressScreen() {
       style={[styles.screen, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
     >
-      <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Progress</Text>
+      <Text variant="headlineSmall" style={[styles.title, { color: colors.textPrimary }]}>Progress</Text>
 
       {/* Streak */}
       <Surface style={[styles.card, { backgroundColor: '#1e3060' }]} elevation={1}>
@@ -91,7 +91,7 @@ export default function ProgressScreen() {
                 ]}
               >
                 <Text style={[styles.badgeEmoji, !isEarned && styles.badgeEmojiLocked]}>
-                  {isEarned ? badge.emoji : ''}
+                  {isEarned ? badge.emoji : '🔒'}
                 </Text>
                 <Text style={[styles.badgeLabel, { color: isEarned ? colors.warning : colors.textSecondary }]}>
                   {badge.label}
@@ -142,7 +142,7 @@ export default function ProgressScreen() {
       )}
 
       {paceHistory.length === 0 && (
-        <Surface style={[styles.card, styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]} elevation={0}>
+        <Surface style={[styles.card, styles.emptyCard, { backgroundColor: '#1e3060', borderColor: colors.border }]} elevation={0}>
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
             Complete runs and log your pace to see it here.
           </Text>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   badgeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   badge: { alignItems: 'center', width: 72, padding: 8, borderRadius: 8 },
   badgeEmoji: { fontSize: 28, marginBottom: 4 },
-  badgeEmojiLocked: { opacity: 0.4 },
+  badgeEmojiLocked: { opacity: 0.5 },
   badgeLabel: { fontSize: 10, fontWeight: '700', textAlign: 'center' },
 
   predictionNote: { fontSize: 11, marginBottom: 10, fontStyle: 'italic' },

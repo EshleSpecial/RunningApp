@@ -102,7 +102,7 @@ export default function PlanScreen() {
       )}
       ListHeaderComponent={
         <View style={styles.listHeader}>
-          <Text variant="headlineSmall" style={[styles.title, { color: colors.primary }]}>Training Plan</Text>
+          <Text variant="headlineSmall" style={[styles.title, { color: colors.textPrimary }]}>Training Plan</Text>
           <Text variant="bodySmall" style={[styles.subtitle, { color: colors.accent }]}>
             {plan.length} week{plan.length !== 1 ? 's' : ''} · {raceSubtitle(profile?.races ?? [])}
           </Text>
@@ -112,7 +112,8 @@ export default function PlanScreen() {
             onPress={handleExportCalendar}
             loading={calExporting}
             disabled={calExporting || plan.length === 0}
-            style={[styles.calBtn, { borderColor: colors.primary }]}
+            style={[styles.calBtn, { borderColor: colors.accent }]}
+            textColor={colors.accent}
           >
             Export to Calendar
           </Button>
@@ -139,7 +140,7 @@ function WeekBlock({ week, log }: { week: TrainingWeek; log: WorkoutLog }) {
       elevation={1}
     >
       <View style={styles.weekHeader}>
-        <Text variant="labelLarge" style={[styles.weekNum, { color: colors.primary }]}>
+        <Text variant="labelLarge" style={[styles.weekNum, { color: colors.textPrimary }]}>
           Week {week.weekNumber}
         </Text>
         <Text variant="bodySmall" style={[styles.weekDates, { color: colors.textSecondary }]}>

@@ -29,7 +29,7 @@ export const Colors = {
     hill_run:     { accent: '#f97316', pillBg: '#1e1008', pillText: '#fb923c' },
     cross_train:  { accent: '#E8832A', pillBg: '#1e1008', pillText: '#E8832A' },
     pt_only:      { accent: '#7c3aed', pillBg: '#150d2e', pillText: '#a78bfa' },
-    rest:         { accent: '#374151', pillBg: '#111820', pillText: '#6b7280' },
+    rest:         { accent: '#a8bdd4', pillBg: '#111820', pillText: '#a8bdd4' },
     race:         { accent: '#E8832A', pillBg: '#1e1008', pillText: '#E8832A' },
   },
 };
