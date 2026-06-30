@@ -177,7 +177,7 @@ export function generateTrainingPlan(profile: UserProfile): TrainingWeek[] {
     } else if (isTaper) {
       workouts = buildTaperWeek(weekStart, phase, longRunMiles * mult);
     } else {
-      workouts = buildRegularWeek(weekStart, phase, longRunMiles * mult, difficulty);
+      workouts = buildRegularWeek(weekStart, phase, longRunMiles * mult, difficulty, w);
     }
 
     const targetDays = profile.trainingDaysPerWeek ?? 5;
@@ -208,7 +208,7 @@ export function generateTrainingPlan(profile: UserProfile): TrainingWeek[] {
 
 // Offsets: 0=Mon 1=Tue 2=Wed 3=Thu 4=Fri 5=Sat 6=Sun
 
-function buildRegularWeek(ws: Date, phase: Phase, longRun: number, difficulty: CourseDifficulty = 'flat'): Workout[] {
+function buildRegularWeek(ws: Date, phase: Phase, longRun: number, difficulty: CourseDifficulty = 'flat', weekNumber = 1): Workout[] {
   const lr = parseFloat(longRun.toFixed(1));
 
   if (phase === 1) {
@@ -224,11 +224,14 @@ function buildRegularWeek(ws: Date, phase: Phase, longRun: number, difficulty: C
   }
 
   if (phase === 2) {
-    const wed2Notes = 'Easy run. If hips feel tight, take walk breaks.' + hillNote(difficulty);
+    const isEvenWeek = weekNumber % 2 === 0;
+    const wedWorkout = isEvenWeek
+      ? workout(ws, 2, 'interval_run', { distanceMiles: 4, notes: 'Intervals: after 1 mile warmup, run 6 x 400m at hard effort with 90 sec walk recovery between each. Cool down 1 mile easy. Focus on quick turnover.' })
+      : workout(ws, 2, 'fartlek', { distanceMiles: 4, notes: 'Fartlek: run easy for 5 min then alternate 1 min hard / 2 min easy for 20 minutes. Finish with 5 min easy cooldown. Run by feel, not pace.' });
     return [
       workout(ws, 0, 'easy_run', { distanceMiles: 3, notes: 'Easy run. Conversational pace throughout. 170–180 spm.' }),
       workout(ws, 1, 'pt_only', { notes: 'Full strength & mobility session.' }),
-      workout(ws, 2, 'easy_run', { distanceMiles: 3.5, notes: wed2Notes }),
+      wedWorkout,
       workout(ws, 3, 'cross_train', { durationMins: 35, notes: 'Active recovery — bike, swim, or elliptical at easy effort.' }),
       workout(ws, 4, 'easy_run', { distanceMiles: 3, notes: 'Easy run. End with stability exercises.' }),
       workout(ws, 5, 'long_run', { distanceMiles: lr, notes: `Long run at easy conversational pace. Time on feet matters more than pace. Walk breaks are encouraged. 170–180 spm.` }),
@@ -237,11 +240,10 @@ function buildRegularWeek(ws: Date, phase: Phase, longRun: number, difficulty: C
   }
 
   if (phase === 3) {
-    const wed3Notes = 'Include 2 miles at 10K goal pace in the middle. Hip check at halfway.' + hillNote(difficulty);
     return [
       workout(ws, 0, 'easy_run', { distanceMiles: 4, notes: 'Easy run. Steady effort, keep it comfortable.' }),
       workout(ws, 1, 'pt_only', { notes: 'Strength & mobility session + hip flexor stretching.' }),
-      workout(ws, 2, 'easy_run', { distanceMiles: 5, notes: wed3Notes }),
+      workout(ws, 2, 'tempo_run', { distanceMiles: 5, notes: 'Tempo run: 1 mile warmup, then 2-3 miles at comfortably hard pace (you can speak only a few words), 1 mile cooldown. This builds race-specific fitness.' }),
       workout(ws, 3, 'rest', { notes: 'Rest before long run weekend.' }),
       workout(ws, 4, 'easy_run', { distanceMiles: 4, notes: 'Easy shakeout. Legs fresh for tomorrow\'s long run.' }),
       workout(ws, 5, 'long_run', { distanceMiles: lr, notes: `Long run. This is your most important workout. Easy effort — you should be able to hold a conversation. Walk the uphills.` }),
@@ -267,7 +269,7 @@ function buildRegularWeek(ws: Date, phase: Phase, longRun: number, difficulty: C
   return [
     workout(ws, 0, 'easy_run', { distanceMiles: 5, notes: 'Easy run. Never push hard in training during this phase.' }),
     workout(ws, 1, 'pt_only', { notes: 'Strength & mobility session. Hip maintenance is critical this phase.' }),
-    workout(ws, 2, 'easy_run', { distanceMiles: 6, notes: 'Medium run. Include a few miles near half marathon effort.' }),
+    workout(ws, 2, 'hill_run', { distanceMiles: 6, notes: 'Hill repeats: find a moderate hill. After 1 mile warmup, run 8 repeats of 30 sec hard uphill, walk down to recover. Builds strength for race day.' }),
     workout(ws, 3, 'rest', { notes: 'Rest before back-to-back weekend. Eat well and sleep.' }),
     workout(ws, 4, 'easy_run', { distanceMiles: 3, notes: 'Short shakeout. Keep it very easy.' }),
     workout(ws, 5, 'long_run', { distanceMiles: satRun, notes: `Saturday long run — simulate back-to-back race effort. Stay easy: ${satRun} miles.` }),

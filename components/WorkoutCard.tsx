@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Card, Button, Text } from 'react-native-paper';
+import { format, parseISO } from 'date-fns';
 import { calculateFueling, getTreadmillSettings } from '../lib/fueling';
 import PostRunLogger from './PostRunLogger';
 import { useTheme } from '../constants/theme';
 import type { Workout, WorkoutLogEntry } from '../types';
 
 const TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-  easy_run:    { label: 'Easy Run',          color: '#16a34a' },
-  long_run:    { label: 'Long Run',           color: '#2563eb' },
-  cross_train: { label: 'Cross-Train',        color: '#d97706' },
-  pt_only:     { label: 'Injury & Recovery',  color: '#7c3aed' },
-  rest:        { label: 'Rest Day',           color: '#6b7280' },
-  race:        { label: 'RACE DAY',           color: '#dc2626' },
+  easy_run:     { label: 'Easy Run',          color: '#16a34a' },
+  long_run:     { label: 'Long Run',           color: '#2563eb' },
+  interval_run: { label: 'Intervals',          color: '#f43f5e' },
+  tempo_run:    { label: 'Tempo Run',          color: '#f43f5e' },
+  fartlek:      { label: 'Fartlek',            color: '#a855f7' },
+  hill_run:     { label: 'Hill Repeats',       color: '#f97316' },
+  cross_train:  { label: 'Cross-Train',        color: '#d97706' },
+  pt_only:      { label: 'Injury & Recovery',  color: '#7c3aed' },
+  rest:         { label: 'Rest Day',           color: '#6b7280' },
+  race:         { label: 'RACE DAY',           color: '#dc2626' },
 };
 
 const WARMUP_STEPS = [
@@ -96,6 +101,9 @@ export default function WorkoutCard({
         <View style={styles.header}>
           <View style={styles.titleRow}>
             <View>
+              <Text style={[styles.dayLabel, { color: colors.textSecondary }]}>
+                {format(parseISO(workout.date), 'EEEE')}
+              </Text>
               <Text variant="titleMedium" style={{ color: wc.accent, fontWeight: '700' }}>
                 {displayLabel}
               </Text>
@@ -237,6 +245,7 @@ const styles = StyleSheet.create({
     gap: 8,
     flex: 1,
   },
+  dayLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 },
   notes: { marginTop: 8, lineHeight: 18 },
   treadmillBox: {
     marginTop: 8,
