@@ -66,12 +66,12 @@ export default function ProgressScreen() {
         <View style={styles.streakStats}>
           <View style={styles.streakStat}>
             <Text style={[styles.streakStatVal, { color: colors.accent }]}>{streakMeta.longestStreak}</Text>
-            <Text style={[styles.streakStatLabel, { color: colors.textPrimary }]}>Best streak</Text>
+            <Text style={[styles.streakStatLabel, { color: colors.textSecondary }]}>Best streak</Text>
           </View>
           <View style={[styles.streakDivider, { backgroundColor: colors.border }]} />
           <View style={styles.streakStat}>
             <Text style={[styles.streakStatVal, { color: colors.accent }]}>{totalDone}</Text>
-            <Text style={[styles.streakStatLabel, { color: colors.textPrimary }]}>Total workouts</Text>
+            <Text style={[styles.streakStatLabel, { color: colors.textSecondary }]}>Total workouts</Text>
           </View>
         </View>
       </Surface>

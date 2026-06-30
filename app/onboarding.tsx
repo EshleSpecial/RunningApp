@@ -175,7 +175,7 @@ export default function Onboarding() {
       <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Text variant="headlineMedium" style={[styles.title, { color: '#e8e4dd' }]}>I Can Do Hard Things</Text>
-          <Text variant="bodyMedium" style={[styles.subtitle, { color: '#e8e4dd' }]}>Your training journey starts here</Text>
+          <Text variant="bodyMedium" style={[styles.subtitle, { color: colors.accent }]}>Your training journey starts here</Text>
           <ProgressBar
             progress={displayProgress}
             color={colors.accent}
@@ -269,15 +269,15 @@ export default function Onboarding() {
                     key={d}
                     mode={trainingDays === d ? 'contained' : 'outlined'}
                     onPress={() => setTrainingDays(d)}
-                    style={[styles.dayBtn, trainingDays === d && { backgroundColor: colors.primary }]}
+                    style={[styles.dayBtn, trainingDays === d && { backgroundColor: colors.accent }]}
                     labelStyle={[styles.dayBtnLabel, trainingDays === d && { color: '#fff' }]}
                   >
-                    {d} days
+                    {String(d)}
                   </Button>
                 ))}
               </View>
               <Surface style={[styles.daysDesc, { backgroundColor: colors.surface }]} elevation={0}>
-                <Text style={[styles.daysDescText, { color: colors.primary }]}>{daysDescription(trainingDays)}</Text>
+                <Text style={[styles.daysDescText, { color: colors.textPrimary }]}>{daysDescription(trainingDays)}</Text>
               </Surface>
             </View>
           )}
@@ -300,7 +300,7 @@ export default function Onboarding() {
                 <Button
                   mode={prefersTreadmill ? 'contained' : 'outlined'}
                   onPress={() => setPrefersTreadmill(true)}
-                  style={[styles.envBtn, prefersTreadmill && { backgroundColor: colors.primary }]}
+                  style={[styles.envBtn, prefersTreadmill && { backgroundColor: colors.accent }]}
                   labelStyle={prefersTreadmill ? { color: '#fff' } : { color: '#e8e4dd' }}
                   icon="run-fast"
                 >
@@ -316,7 +316,7 @@ export default function Onboarding() {
                     key={opt.value}
                     mode={pace === opt.value ? 'contained' : 'outlined'}
                     onPress={() => setPace(opt.value)}
-                    style={[styles.paceBtn, pace === opt.value && { backgroundColor: colors.primary }]}
+                    style={[styles.paceBtn, pace === opt.value && { backgroundColor: colors.accent }]}
                     labelStyle={[styles.paceBtnLabel, pace === opt.value && { color: '#fff' }]}
                   >
                     {opt.label}
@@ -349,7 +349,7 @@ export default function Onboarding() {
                     key={opt.value}
                     mode={courseDifficulty === opt.value ? 'contained' : 'outlined'}
                     onPress={() => setCourseDifficulty(opt.value)}
-                    style={[styles.courseBtn, courseDifficulty === opt.value && { backgroundColor: colors.primary }]}
+                    style={[styles.courseBtn, courseDifficulty === opt.value && { backgroundColor: colors.accent }]}
                     labelStyle={[styles.courseBtnLabel, courseDifficulty === opt.value && { color: '#fff' }]}
                   >
                     {opt.label}
@@ -376,7 +376,7 @@ export default function Onboarding() {
                     key={opt.value}
                     mode={goalType === opt.value ? 'contained' : 'outlined'}
                     onPress={() => setGoalType(opt.value)}
-                    style={[styles.goalBtn, goalType === opt.value && { backgroundColor: colors.primary }]}
+                    style={[styles.goalBtn, goalType === opt.value && { backgroundColor: colors.accent }]}
                     labelStyle={[styles.goalBtnLabel, goalType === opt.value && { color: '#fff' }]}
                   >
                     {opt.label}
@@ -405,7 +405,7 @@ export default function Onboarding() {
                         key={w}
                         mode={planWeeks === w ? 'contained' : 'outlined'}
                         onPress={() => setPlanWeeks(w)}
-                        style={[styles.dayBtn, planWeeks === w && { backgroundColor: colors.primary }]}
+                        style={[styles.dayBtn, planWeeks === w && { backgroundColor: colors.accent }]}
                         labelStyle={[styles.dayBtnLabel, planWeeks === w && { color: '#fff' }]}
                       >
                         {w} wks
@@ -444,7 +444,7 @@ export default function Onboarding() {
                         key={opt.value}
                         mode={currentRaceDistance === opt.value ? 'contained' : 'outlined'}
                         onPress={() => setCurrentRaceDistance(opt.value)}
-                        style={[styles.distBtn, currentRaceDistance === opt.value && { backgroundColor: colors.primary }]}
+                        style={[styles.distBtn, currentRaceDistance === opt.value && { backgroundColor: colors.accent }]}
                         labelStyle={[{ fontSize: 11 }, currentRaceDistance === opt.value && { color: '#fff' }]}
                         contentStyle={{ paddingHorizontal: 4, minWidth: 0 }}
                       >
@@ -469,16 +469,16 @@ export default function Onboarding() {
                     mode="contained"
                     onPress={addRace}
                     disabled={!currentRaceName.trim() || !currentRaceDate.trim()}
-                    style={[styles.addRaceBtn, { backgroundColor: colors.primary }]}
+                    style={[styles.addRaceBtn, { backgroundColor: colors.accent }]}
                   >
                     Add Race
                   </Button>
 
                   {races.map((race, i) => (
-                    <Surface key={race.id} style={[styles.raceItem, { backgroundColor: colors.surface, borderColor: colors.primary }]} elevation={0}>
+                    <Surface key={race.id} style={[styles.raceItem, { backgroundColor: colors.surface, borderColor: colors.accent }]} elevation={0}>
                       <View style={styles.raceItemRow}>
                         <View style={{ flex: 1 }}>
-                          <Text style={[styles.raceItemName, { color: colors.primary }]}>{race.name}</Text>
+                          <Text style={[styles.raceItemName, { color: colors.accent }]}>{race.name}</Text>
                           <Text style={[styles.raceItemDetail, { color: colors.textPrimary }]}>{race.date} · {race.distanceMiles} mi</Text>
                         </View>
                         <Button
