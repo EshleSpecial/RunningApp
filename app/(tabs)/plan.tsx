@@ -83,6 +83,7 @@ export default function PlanScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [calExporting, setCalExporting] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+  const [selectedPhase, setSelectedPhase] = useState<{ name: string; phase: number } | null>(null);
 
   const load = useCallback(async () => {
     const [pl, wl, p] = await Promise.all([loadTrainingPlan(), loadWorkoutLog(), loadUserProfile()]);
@@ -130,12 +131,19 @@ export default function PlanScreen() {
         keyExtractor={(item: TrainingWeek) => item.startDate}
         stickySectionHeadersEnabled
         renderSectionHeader={({ section }: { section: { phase: number; phaseName: string; data: TrainingWeek[] } }) => (
-          <View style={[styles.sectionHeader, { backgroundColor: '#0a1220' }]}>
+          <TouchableOpacity
+            style={[styles.sectionHeader, { backgroundColor: '#0a1220' }]}
+            onPress={() => setSelectedPhase({ name: section.phaseName, phase: section.phase })}
+            activeOpacity={0.7}
+          >
             <View style={[styles.phaseBar, { backgroundColor: PHASE_COLORS[section.phase] }]} />
-            <Text style={[styles.phaseName, { color: PHASE_COLORS[section.phase] }]}>
+            <Text style={[styles.phaseName, { color: PHASE_COLORS[section.phase], flex: 1 }]}>
               {section.phaseName}
             </Text>
-          </View>
+            <View style={[styles.phaseInfoIcon, { borderColor: colors.textSecondary }]}>
+              <Text style={[styles.phaseInfoIconText, { color: colors.textSecondary }]}>i</Text>
+            </View>
+          </TouchableOpacity>
         )}
         renderItem={({ item: week }: { item: TrainingWeek }) => (
           <WeekBlock week={week} log={log} onSelectWorkout={setSelectedWorkout} />
@@ -167,7 +175,108 @@ export default function PlanScreen() {
         onClose={() => setSelectedWorkout(null)}
         onMarkComplete={handleMarkComplete}
       />
+
+      <PhaseInfoModal
+        phase={selectedPhase}
+        onClose={() => setSelectedPhase(null)}
+      />
     </>
+  );
+}
+
+function getPhaseInfo(phaseName: string): { description: string; tip: string } {
+  if (phaseName === 'Foundation') {
+    return {
+      description: 'This is where your training begins. The goal is to build a consistent aerobic base with easy, conversational runs. No hard efforts yet — just time on your feet. These weeks teach your body to adapt to regular training and reduce injury risk before the harder work begins.',
+      tip: 'Keep every run at a pace where you can hold a full conversation. If you cannot, slow down.',
+    };
+  }
+  if (phaseName === 'Base Build') {
+    return {
+      description: 'Your mileage and long run are growing steadily. This phase develops your aerobic engine — the foundation that every other type of training depends on. You will notice interval and fartlek workouts appearing mid-week. These introduce speed in a controlled way while your long runs continue building endurance.',
+      tip: 'Do your hard workouts hard and your easy runs easy. Most runners make the mistake of doing everything at medium effort.',
+    };
+  }
+  if (phaseName.includes('Taper') || phaseName.includes('Race Week') === false && phaseName.toLowerCase().includes('taper')) {
+    if (phaseName.includes('Race Week')) {
+      return {
+        description: 'Race week is here. Your training is done — nothing you do this week will make you fitter, but poor decisions can make you slower. Keep runs short and easy, stay off your feet as much as possible, eat well, hydrate, and trust every mile you have logged to get here.',
+        tip: 'Lay out all your gear the night before. Know your start time, parking, and bag check details.',
+      };
+    }
+    return {
+      description: 'Your body needs time to absorb all the training you have done and arrive at the start line fresh and ready. Taper weeks reduce your mileage while keeping some intensity so your legs stay sharp. Trust the process — feeling restless or sluggish during taper is completely normal and a sign the training is working.',
+      tip: 'Avoid the temptation to cram in extra miles. The hay is in the barn.',
+    };
+  }
+  if (phaseName.includes('Race Week')) {
+    return {
+      description: 'Race week is here. Your training is done — nothing you do this week will make you fitter, but poor decisions can make you slower. Keep runs short and easy, stay off your feet as much as possible, eat well, hydrate, and trust every mile you have logged to get here.',
+      tip: 'Lay out all your gear the night before. Know your start time, parking, and bag check details.',
+    };
+  }
+  if (phaseName.includes('Prep')) {
+    return {
+      description: 'These weeks are race-specific preparation. Your long runs are at their peak and workouts are dialed in to match your race demands. Terrain, pace, and back-to-back efforts simulate what race day will feel like. Stay consistent, sleep well, and fuel properly.',
+      tip: 'Practice your race-day nutrition and gear on your long runs. Race day is not the time to try anything new.',
+    };
+  }
+  if (phaseName === 'Recovery & Rebuild' || phaseName.includes('Recovery')) {
+    return {
+      description: 'After a race your body needs genuine recovery before it can absorb new training. These weeks have reduced intensity and volume by design. Easy runs flush out fatigue while your connective tissue and muscles repair. Resist the urge to push — this phase makes the next one possible.',
+      tip: 'Sleep is your most powerful recovery tool this phase. Prioritize it over extra easy miles.',
+    };
+  }
+  if (phaseName === 'Maintenance') {
+    return {
+      description: 'You are between training blocks. These weeks keep your aerobic base intact with consistent easy running so you do not lose fitness. When your next race cycle begins you will be ready to build from a strong base rather than starting over.',
+      tip: 'Consistency beats perfection every time.',
+    };
+  }
+  return {
+    description: 'This phase of your training has a specific purpose in your overall plan. Each week builds on the last — trust the process and focus on consistency over perfection.',
+    tip: 'Consistency beats perfection every time.',
+  };
+}
+
+function PhaseInfoModal({
+  phase,
+  onClose,
+}: {
+  phase: { name: string; phase: number } | null;
+  onClose: () => void;
+}) {
+  const { colors } = useTheme();
+  if (!phase) return null;
+
+  const phaseColor = PHASE_COLORS[phase.phase] ?? colors.accent;
+  const { description, tip } = getPhaseInfo(phase.name);
+
+  return (
+    <Modal
+      visible={true}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
+      <View style={modalStyles.overlay}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View style={[modalStyles.sheet, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity style={modalStyles.closeBtn} onPress={onClose}>
+            <Text style={[modalStyles.closeBtnText, { color: colors.textPrimary }]}>✕</Text>
+          </TouchableOpacity>
+
+          <Text style={[phaseModalStyles.title, { color: colors.textPrimary }]}>{phase.name}</Text>
+          <View style={[phaseModalStyles.accentBar, { backgroundColor: phaseColor }]} />
+
+          <Text style={[phaseModalStyles.description, { color: colors.textPrimary }]}>{description}</Text>
+
+          <View style={[phaseModalStyles.tipBox, { backgroundColor: colors.surfaceAlt, borderLeftColor: colors.accent }]}>
+            <Text style={[phaseModalStyles.tipText, { color: colors.textPrimary }]}>{tip}</Text>
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -341,6 +450,15 @@ const styles = StyleSheet.create({
   },
   phaseBar: { width: 4, height: 20, borderRadius: 2 },
   phaseName: { fontWeight: '700', fontSize: 14, letterSpacing: 0.3 },
+  phaseInfoIcon: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  phaseInfoIconText: { fontSize: 11, fontWeight: '700', lineHeight: 14 },
   weekCard: {
     margin: 12,
     marginTop: 4,
@@ -444,5 +562,36 @@ const modalStyles = StyleSheet.create({
   completedText: {
     fontSize: 16,
     fontWeight: '700',
+  },
+});
+
+const phaseModalStyles = StyleSheet.create({
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginTop: 4,
+    marginBottom: 10,
+    paddingRight: 32,
+  },
+  accentBar: {
+    height: 3,
+    borderRadius: 2,
+    width: 48,
+    marginBottom: 16,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  tipBox: {
+    borderLeftWidth: 3,
+    borderRadius: 10,
+    padding: 12,
+  },
+  tipText: {
+    fontSize: 13,
+    lineHeight: 20,
+    fontStyle: 'italic',
   },
 });
